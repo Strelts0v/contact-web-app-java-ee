@@ -12,9 +12,15 @@ public class Address {
 
     private String city;
 
-    private String street;
+    private String address;
 
     private String index;
+
+    public final static Address EMPTY_ADDRESS;
+
+    static{
+        EMPTY_ADDRESS = new Address();
+    }
 
     public long getAddressId() {
         return addressId;
@@ -40,12 +46,12 @@ public class Address {
         this.city = city;
     }
 
-    public String getStreet() {
-        return street;
+    public String getAddress() {
+        return address;
     }
 
-    public void setStreet(String street) {
-        this.street = street;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getIndex() {
@@ -68,7 +74,7 @@ public class Address {
                 .append(addressId, address.addressId)
                 .append(country, address.country)
                 .append(city, address.city)
-                .append(street, address.street)
+                .append(this.address, address.address)
                 .append(index, address.index)
                 .isEquals();
     }
@@ -79,7 +85,7 @@ public class Address {
                 .append(addressId)
                 .append(country)
                 .append(city)
-                .append(street)
+                .append(address)
                 .append(index)
                 .toHashCode();
     }
@@ -90,7 +96,7 @@ public class Address {
                 .append("addressId", addressId)
                 .append("country", country)
                 .append("city", city)
-                .append("street", street)
+                .append("address", address)
                 .append("index", index)
                 .toString();
     }

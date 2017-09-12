@@ -19,6 +19,12 @@ public class Attachment {
 
     private File resource;
 
+    public final static Attachment EMPTY_ATTACHMENT;
+
+    static{
+        EMPTY_ATTACHMENT = new Attachment();
+    }
+
     public long getAttachmentId() {
         return attachmentId;
     }
