@@ -4,6 +4,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +37,37 @@ public class Contact {
     private List<Phone> phones;
 
     private List<Attachment> attachments;
+
+    public final static Contact EMPTY_CONTACT;
+
+    static {
+        List<Attachment> attachments = new ArrayList<>();
+        attachments.add(Attachment.EMPTY_ATTACHMENT);
+
+        List<Phone> phones = new ArrayList<>();
+        phones.add(Phone.EMPTY_PHONE);
+
+        EMPTY_CONTACT = new Contact(
+                Address.EMPTY_ADDRESS,
+                attachments,
+                phones
+        );
+    }
+
+    /**
+     * default public constructor
+     */
+    public Contact(){
+    }
+
+    /**
+     * private constructor to initialize static EMPTY_CONTACT object
+     */
+    private Contact(Address address, List<Attachment> attachments, List<Phone> phones){
+        this.address = address;
+        this.attachments = attachments;
+        this.phones = phones;
+    }
 
     public long getContactId() {
         return contactId;
@@ -126,7 +158,7 @@ public class Contact {
     }
 
     public Address getAddress() {
-        return address;
+        return address == null ? Address.EMPTY_ADDRESS : address;
     }
 
     public void setAddress(Address address) {
@@ -134,7 +166,7 @@ public class Contact {
     }
 
     public List<Phone> getPhones() {
-        return phones;
+        return phones == null ? EMPTY_CONTACT.getPhones() : phones;
     }
 
     public void setPhones(List<Phone> phones) {
@@ -142,7 +174,7 @@ public class Contact {
     }
 
     public List<Attachment> getAttachments() {
-        return attachments;
+        return attachments == null ? EMPTY_CONTACT.getAttachments() : attachments;
     }
 
     public void setAttachments(List<Attachment> attachments) {
