@@ -14,6 +14,12 @@ public class Phone {
 
     private String comment;
 
+    public final static Phone EMPTY_PHONE;
+
+    static {
+        EMPTY_PHONE = new Phone();
+    }
+
     public long getPhoneId() {
         return phoneId;
     }
