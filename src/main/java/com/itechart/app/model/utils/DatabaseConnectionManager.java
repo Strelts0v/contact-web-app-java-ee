@@ -1,5 +1,6 @@
 package com.itechart.app.model.utils;
 
+import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.cryptography.Cryptographer;
 import com.itechart.app.model.cryptography.CryptographerXor;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
@@ -66,7 +67,7 @@ public class DatabaseConnectionManager {
                 INSTANCE = new DatabaseConnectionManager();
             }
         }catch (PropertyVetoException e){
-            e.printStackTrace();
+            AppLogger.error(e.getMessage());
         } finally {
             return INSTANCE;
         }

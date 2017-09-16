@@ -10,7 +10,7 @@ public class Phone {
 
     private String phoneNumber;
 
-    private String description;
+    private String phoneType;
 
     private String comment;
 
@@ -36,12 +36,12 @@ public class Phone {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getDescription() {
-        return description;
+    public String getPhoneType() {
+        return phoneType;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setPhoneType(String phoneType) {
+        this.phoneType = phoneType;
     }
 
     public String getComment() {
@@ -63,7 +63,7 @@ public class Phone {
         return new EqualsBuilder()
                 .append(phoneId, phone.phoneId)
                 .append(phoneNumber, phone.phoneNumber)
-                .append(description, phone.description)
+                .append(phoneType, phone.phoneType)
                 .append(comment, phone.comment)
                 .isEquals();
     }
@@ -73,7 +73,7 @@ public class Phone {
         return new HashCodeBuilder(17, 37)
                 .append(phoneId)
                 .append(phoneNumber)
-                .append(description)
+                .append(phoneType)
                 .append(comment)
                 .toHashCode();
     }
@@ -83,7 +83,7 @@ public class Phone {
         return new ToStringBuilder(this)
                 .append("phoneId", phoneId)
                 .append("phoneNumber", phoneNumber)
-                .append("description", description)
+                .append("phoneType", phoneType)
                 .append("comment", comment)
                 .toString();
     }
