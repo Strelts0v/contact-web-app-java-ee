@@ -32,6 +32,8 @@ public class Contact {
 
     private String company;
 
+    private Photo photo;
+
     private Address address;
 
     private List<Phone> phones;
@@ -50,7 +52,8 @@ public class Contact {
         EMPTY_CONTACT = new Contact(
                 Address.EMPTY_ADDRESS,
                 attachments,
-                phones
+                phones,
+                Photo.EMPTY_PHOTO
         );
     }
 
@@ -63,10 +66,11 @@ public class Contact {
     /**
      * private constructor to initialize static EMPTY_CONTACT object
      */
-    private Contact(Address address, List<Attachment> attachments, List<Phone> phones){
+    private Contact(Address address, List<Attachment> attachments, List<Phone> phones, Photo photo){
         this.address = address;
         this.attachments = attachments;
         this.phones = phones;
+        this.photo = photo;
     }
 
     public long getContactId() {
@@ -155,6 +159,14 @@ public class Contact {
 
     public void setCompany(String company) {
         this.company = company;
+    }
+
+    public Photo getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(Photo photo) {
+        this.photo = photo;
     }
 
     public Address getAddress() {
