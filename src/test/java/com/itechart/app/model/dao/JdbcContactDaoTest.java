@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.List;
 
 public class JdbcContactDaoTest {
 
@@ -60,4 +61,15 @@ public class JdbcContactDaoTest {
         return isValid;
     }
 
+    @Test
+    public void getContactsShouldReturnAppropriateCountOfContactsTest() throws Exception{
+        JdbcContactDao dao = JdbcContactDao.newInstance();
+        final int offset = 0;
+        final int recordCount = 4;
+
+        List<Contact> contacts = dao.getContacts(offset, recordCount);
+
+        final String errorMessage = "Expected and actual count of returned contacts are different";
+        Assert.assertEquals(errorMessage, recordCount , contacts.size());
+    }
 }
