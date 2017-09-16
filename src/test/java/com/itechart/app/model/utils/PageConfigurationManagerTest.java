@@ -9,8 +9,8 @@ public class PageConfigurationManagerTest {
 
     @Test
     public void getPageNameWithValidKeyTest() throws Exception {
-        final String pageKey = "path.page.jsp.index";
-        final String expectedPagePath = "/views/jsp/index";
+        final String pageKey = "path.page.jsp.contact-detail";
+        final String expectedPagePath = "/views/jsp/contact-detail.jsp";
         final String errorMessage = "Expected equal expected and actual page path";
 
         final String resultPagePath = PageConfigurationManager.getPageName(pageKey);

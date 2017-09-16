@@ -106,7 +106,7 @@ public class RestRequestTest {
 
     @Test
     public void getGetContactsActionFromValidRestUriTest() throws Exception {
-        final String pathInfo = "/get_contacts";
+        final String pathInfo = "/get_contacts?offset=0&count=4";
         final RestRequest restRequest = new RestRequest(pathInfo);
         final String expectedAction = "get_contacts";
         final String errorMessage = "Expected action from rest request and actual are different";
