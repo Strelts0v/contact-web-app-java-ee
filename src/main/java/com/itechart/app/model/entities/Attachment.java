@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.Date;
 
 public class Attachment {
@@ -17,7 +17,7 @@ public class Attachment {
 
     private String comment;
 
-    private File resource;
+    private InputStream fileStream;
 
     public final static Attachment EMPTY_ATTACHMENT;
 
@@ -57,12 +57,12 @@ public class Attachment {
         this.comment = comment;
     }
 
-    public File getResource() {
-        return resource;
+    public InputStream getFileStream() {
+        return fileStream;
     }
 
-    public void setResource(File resource) {
-        this.resource = resource;
+    public void setFileStream(InputStream fileStream) {
+        this.fileStream = fileStream;
     }
 
     @Override
@@ -78,7 +78,6 @@ public class Attachment {
                 .append(fileName, that.fileName)
                 .append(downloadDate, that.downloadDate)
                 .append(comment, that.comment)
-                .append(resource, that.resource)
                 .isEquals();
     }
 
@@ -89,7 +88,6 @@ public class Attachment {
                 .append(fileName)
                 .append(downloadDate)
                 .append(comment)
-                .append(resource)
                 .toHashCode();
     }
 
@@ -100,7 +98,6 @@ public class Attachment {
                 .append("fileName", fileName)
                 .append("downloadDate", downloadDate)
                 .append("comment", comment)
-                .append("resource", resource)
                 .toString();
     }
 }
