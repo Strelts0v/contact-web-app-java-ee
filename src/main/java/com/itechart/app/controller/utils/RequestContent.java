@@ -26,6 +26,10 @@ public class RequestContent {
         request.setAttribute(name, attribute);
     }
 
+    public Object getAttribute(final String name){
+        return request.getAttribute(name);
+    }
+
     public HttpServletRequest getHttpServletRequest(){
         return request;
     }
