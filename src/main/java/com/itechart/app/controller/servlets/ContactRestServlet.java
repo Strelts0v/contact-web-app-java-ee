@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class ContactRestServlet extends HttpServlet{
 
-    private static final String RESOURCE_ID_ATTRIBUTE = "resourceId";
+    private static final String RESOURCE_ID_ATTRIBUTE = "contactId";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
