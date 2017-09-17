@@ -11,9 +11,19 @@
         <servlet-class>com.itechart.app.controller.servlets.ContactRestServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>ContactUploadServlet</servlet-name>
+        <servlet-class>com.itechart.app.controller.servlets.ContactUploadServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>ContactRestServlet</servlet-name>
         <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ContactUploadServlet</servlet-name>
+        <url-pattern>/upload/*</url-pattern>
     </servlet-mapping>
 
 </web-app>
