@@ -13,7 +13,7 @@ public class GetContactAction implements ContactAction{
 
     private final static String ERROR_PAGE_NAME = "path.page.jsp.error";
 
-    private final static String CONTACT_DETAILS_PAGE_NAME = "path.page.jsp.contact-detail";
+    private final static String CONTACT_DETAIL_PAGE_NAME = "path.page.jsp.contact-detail";
 
     public String execute(RequestContent requestContent) {
         String page;
@@ -27,7 +27,7 @@ public class GetContactAction implements ContactAction{
             Contact contact = dao.getContact(contactId);
             requestContent.insertAttribute(CONTACT_ATTRIBUTE_NAME, contact);
 
-            page = PageConfigurationManager.getPageName(CONTACT_DETAILS_PAGE_NAME);
+            page = PageConfigurationManager.getPageName(CONTACT_DETAIL_PAGE_NAME);
             dao.closeConnection();
         }
 
