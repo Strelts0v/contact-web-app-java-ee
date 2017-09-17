@@ -1,4 +1,4 @@
-<c:url value="/api/get_contacts?offset=0&count=20" var="getContactsUrl" />
+<c:url value="/api/get_contacts?page=1" var="getContactsUrl" />
 <c:url value="/api/create_contact" var="createContactUrl">
     <c:param name="contact_submit" value="false" />
 </c:url>

@@ -11,6 +11,8 @@ public class Attachment {
 
     private long attachmentId;
 
+    private long contactId;
+
     private String fileName;
 
     private Date downloadDate;
@@ -18,6 +20,8 @@ public class Attachment {
     private String comment;
 
     private InputStream fileStream;
+
+    private long fileSize;
 
     public final static Attachment EMPTY_ATTACHMENT;
 
@@ -31,6 +35,14 @@ public class Attachment {
 
     public void setAttachmentId(long attachmentId) {
         this.attachmentId = attachmentId;
+    }
+
+    public long getContactId() {
+        return contactId;
+    }
+
+    public void setContactId(long contactId) {
+        this.contactId = contactId;
     }
 
     public String getFileName() {
@@ -65,6 +77,14 @@ public class Attachment {
         this.fileStream = fileStream;
     }
 
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -75,6 +95,8 @@ public class Attachment {
 
         return new EqualsBuilder()
                 .append(attachmentId, that.attachmentId)
+                .append(contactId, that.contactId)
+                .append(fileSize, that.fileSize)
                 .append(fileName, that.fileName)
                 .append(downloadDate, that.downloadDate)
                 .append(comment, that.comment)
@@ -85,9 +107,11 @@ public class Attachment {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(attachmentId)
+                .append(contactId)
                 .append(fileName)
                 .append(downloadDate)
                 .append(comment)
+                .append(fileSize)
                 .toHashCode();
     }
 
@@ -95,9 +119,11 @@ public class Attachment {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("attachmentId", attachmentId)
+                .append("contactId", contactId)
                 .append("fileName", fileName)
                 .append("downloadDate", downloadDate)
                 .append("comment", comment)
+                .append("fileSize", fileSize)
                 .toString();
     }
 }
