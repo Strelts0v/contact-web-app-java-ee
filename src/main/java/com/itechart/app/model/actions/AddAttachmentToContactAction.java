@@ -68,37 +68,4 @@ public class AddAttachmentToContactAction implements ContactAction{
         }
         return page;
     }
-
-    /**
-     * Upload the file to database
-     * The folder should be created
-     *
-     * @param item
-     * @throws Exception
-     */
-    private void processUploadedFile(FileItem item) throws Exception {
-        String fieldName = item.getFieldName();
-        String fileName = item.getName();
-        String contentType = item.getContentType();
-        boolean isInMemory = item.isInMemory();
-        long sizeInBytes = item.getSize();
-
-
-//        // Process a file upload
-//        if (writeToFile) {
-//            File uploadedFile = new File(...);
-//            item.write(uploadedFile);
-//        } else {
-//            InputStream uploadedStream = item.getInputStream(); // ...
-//            uploadedStream.close();
-//        }
-    }
-    /**
-     * Log field name and content
-     * @param item
-     */
-    private void processFormField(FileItem item) {
-        String name = item.getFieldName();
-        String value = item.getString();
-    }
 }
