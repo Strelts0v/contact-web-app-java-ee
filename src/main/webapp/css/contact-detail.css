@@ -1,0 +1,16 @@
+.contact-navbar{
+    background-color: #3fad50;
+    border: 0px;
+}
+
+.contact-navbar a {
+    color: #f2e267;
+}
+
+.control-button{
+    margin-bottom: 5px !important;
+}
+
+.info-table-area{
+    padding: 20px !important;
+}
