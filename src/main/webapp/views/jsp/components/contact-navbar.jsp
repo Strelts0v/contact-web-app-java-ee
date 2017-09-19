@@ -4,21 +4,23 @@
 </c:url>
 <c:url value="/api/" var="var2" />
 
-<div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">Contact book</h1>
-    </div>
-</div>
-<nav class="navbar navbar-default">
+<nav class="navbar contact-navbar">
     <div class="container-fluid">
-        <%--<div class="navbar-header">--%>
-            <%--<a class="navbar-brand" href="${getContactsUrl}">Contacts</a>--%>
-        <%--</div>--%>
-        <ul class="nav navbar-nav">
-            <!--<li class="active"><a href="#">Home</a></li>-->
-            <li><a href="${getContactsUrl}">Contacts</a></li>
-            <li><a href="${createContactUrl}">New contact</a></li>
-        </ul>
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Contact book</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="${getContactsUrl}">
+                    <i class="fa fa-users fa-lg" aria-hidden="true"></i> Contacts
+                </a></li>
+                <li><a href="${createContactUrl}">
+                    <i class="fa fa-search fa-lg" aria-hidden="true"></i> Search
+                </a></li>
+                <li><a href="#">
+                    <i class="fa fa-envelope-o fa-lg" aria-hidden="true"></i> Email
+                </a></li>
+            </ul>
+        </div>
     </div>
 </nav>
-<hr>
