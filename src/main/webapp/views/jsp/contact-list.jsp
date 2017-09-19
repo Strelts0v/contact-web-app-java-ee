@@ -16,90 +16,93 @@
 <head>
     <link href="../../css/styles.css" rel="stylesheet">
     <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../css/navbar.css" rel="stylesheet">
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
+<!-- Navigation -->
+<%@include file="components/contact-navbar.jsp"%>
+
 <div class="container">
-    <!-- Navigation -->
-    <%@include file="components/contact-navbar.jsp"%>
 
     <div class="row">
-        <button type="submit" class="btn btn-danger" onclick="deleteCheckedContacts()">Delete</button>
-        <button type="submit" class="btn btn-info" onclick="">Send email</button>
-        <button type="submit" class="btn btn-warning" onclick="">Search</button>
-    </div>
-    <hr>
-
-    <!-- Content Row -->
-    <div class="row">
-        <c:if test="${not empty contactList}">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Select all</th>
-                    <th>Full name</th>
-                    <th>Birthday</th>
-                    <th>Address</th>
-                    <th>Company</th>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach var="contact" items="${contactList}">
-                    <tr>
-                        <td><input type="checkbox" name="selected_contacts" value="${contact.contactId}" /></td>
-                        <td><a href="${getContactByIdUrl}${contact.contactId}">
-                            <c:out value="${contact.firstName} ${contact.patronymic} ${contact.surname}"/>
-                        </a></td>
-                        <td><c:out value="${contact.birthday}"/></td>
-                        <td><c:out value="${contact.address.country}, ${contact.address.city}, ${contact.address.address}, ${contact.address.index}"/></td>
-                        <td><c:out value="${contact.company}"/></td>
-                    </tr>
-                </c:forEach>
-                </tbody>
-            </table>
-
-            <%--Declare variable for current page and count of contacts --%>
-            <c:set var="currentPage" scope ="session" value="${param.page}"/>
-
-            <%--For displaying Page numbers.
-	        The when condition does not display a link for the current page--%>
-            <div class="row">
-                <div class="col-md-4 col-md-offset-4">
-                    <ul class="pagination">
-
-                        <%--For displaying Previous link except for the 1st page --%>
-                        <c:if test="${currentPage != 1}">
-                            <li><a href="${getContactPageUrl}${currentPage - 1}">Previous</a></li>
-                        </c:if>
-
-                        <%--For displaying all available pages--%>
-                        <c:forEach begin="1" end="${pageCount}" var="i">
-                            <c:choose>
-                                <c:when test="${currentPage eq i}">
-                                    <li class="active"><a>${i}</a></li>
-                                </c:when>
-                                <c:otherwise>
-                                    <li>
-                                        <a href="${getContactPageUrl}${i}">${i}</a>
-                                    </li>
-                                </c:otherwise>
-                            </c:choose>
-                        </c:forEach>
-
-                        <%--For displaying Next link --%>
-                        <c:if test="${currentPage lt pageCount}">
-                            <li>
-                                <a href="${getContactPageUrl}${currentPage + 1}">Next</a>
-                            </li>
-                        </c:if>
-                    </ul>
-                </div>
+        <div class="panel panel-default text-left">
+            <div class="panel-body">
+                <h3>Your contacts</h3>
             </div>
-        </c:if>
+        </div>
+        <button type="submit" class="btn btn-danger btn-md" onclick="deleteCheckedContacts()">
+            <i class="fa fa-trash-o fa-lg" aria-hidden="true"></i> Delete
+        </button>
+        <button type="submit" class="btn btn-info btn-md" onclick="">
+            <i class="fa fa-envelope-o fa-lg" aria-hidden="true"></i> Send email
+        </button>
+        <hr>
+
+        <table class="table table-bordred table-striped">
+            <thead>
+            <tr>
+                <th><input type="checkbox" id="checkall" /></th>
+                <th>Full name</th>
+                <th>Birthday</th>
+                <th>Address</th>
+                <th>Company</th>
+            </tr>
+            </thead>
+            <c:if test="${not empty contactList}">
+            <tbody>
+            <c:forEach var="contact" items="${contactList}">
+                <tr>
+                    <td><input type="checkbox" name="selected_contacts" value="${contact.contactId}" /></td>
+                    <td><a href="${getContactByIdUrl}${contact.contactId}">
+                        <c:out value="${contact.firstName} ${contact.patronymic} ${contact.surname}"/>
+                    </a></td>
+                    <td><c:out value="${contact.birthday}"/></td>
+                    <td><c:out value="${contact.address.country}, ${contact.address.city}, ${contact.address.address}, ${contact.address.index}"/></td>
+                    <td><c:out value="${contact.company}"/></td>
+                </tr>
+            </c:forEach>
+            </tbody>
+            </c:if>
+        </table>
+
+        <%--Declare variable for current page and count of contacts --%>
+        <c:set var="currentPage" scope ="session" value="${param.page}"/>
+
+        <%--For displaying Page numbers--%>
+        <ul class="pagination pull-right">
+
+            <%--For displaying Previous link except for the 1st page --%>
+            <li class="<c:if test="${currentPage == 1}">disabled</c:if>">
+                <a href="${getContactPageUrl}${currentPage - 1}">
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                </a>
+            </li>
+
+            <%--For displaying all available pages--%>
+            <c:forEach begin="1" end="${pageCount}" var="i">
+                <c:choose>
+                    <c:when test="${currentPage eq i}">
+                        <li class="active"><a>${i}</a></li>
+                    </c:when>
+                    <c:otherwise>
+                        <li><a href="${getContactPageUrl}${i}">${i}</a> </li>
+                    </c:otherwise>
+                </c:choose>
+            </c:forEach>
+
+            <%--For displaying Next link --%>
+            <li class="<c:if test="${currentPage == pageCount}">disabled</c:if>">
+                <a href="${getContactPageUrl}${currentPage + 1}">
+                    <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
     </div>
     <!-- /.row -->
-    <hr>
 </div>
 <!-- /.container -->
 
@@ -121,5 +124,5 @@
         xhr.send();
     }
 </script>
-<html lang="en">
+</html>
 
