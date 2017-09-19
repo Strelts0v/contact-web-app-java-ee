@@ -23,6 +23,8 @@ public class UpdateContactAction implements ContactAction{
         final int contactId = Integer.parseInt(requestContent.getParameter(ID_PARAM));
         try {
             Contact contact = ContactMapper.mapContactParams(requestContent);
+//            List<Phone> phones = PhonesMapper.mapPhones(requestContent);
+//            List<Attachment> attachments = AttachmentMapper.mapAttachments(requestContent);
             contact.setContactId(contactId);
 
             JdbcContactDao dao = JdbcContactDao.newInstance();
