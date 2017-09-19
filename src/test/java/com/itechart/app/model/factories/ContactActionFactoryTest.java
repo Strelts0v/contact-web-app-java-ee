@@ -31,17 +31,6 @@ public class ContactActionFactoryTest {
     }
 
     @Test
-    public void defineAddPhoneToContactActionTest() throws Exception {
-        final String restUrl = "add_phone_to_contact";
-
-        final String errorMessage
-                = "Expected and actual type of returned ContactAction instance are different";
-
-        final ContactAction action = factory.defineContactAction(restUrl);
-        Assert.assertTrue(errorMessage, action.getClass() == AddPhoneToContactAction.class);
-    }
-
-    @Test
     public void defineDeleteContactActionTest() throws Exception {
         final String restUrl = "delete_contact";
 
@@ -50,28 +39,6 @@ public class ContactActionFactoryTest {
 
         final ContactAction action = factory.defineContactAction(restUrl);
         Assert.assertTrue(errorMessage, action.getClass() == DeleteContactAction.class);
-    }
-
-    @Test
-    public void defineDeleteAttachmentFromContactActionTest() throws Exception {
-        final String restUrl = "delete_attachment_from_contact";
-
-        final String errorMessage
-                = "Expected and actual type of returned ContactAction instance are different";
-
-        final ContactAction action = factory.defineContactAction(restUrl);
-        Assert.assertTrue(errorMessage, action.getClass() == DeleteAttachmentFromContactAction.class);
-    }
-
-    @Test
-    public void defineDeletePhoneFromContactActionTest() throws Exception {
-        final String restUrl = "delete_phone_from_contact";
-
-        final String errorMessage
-                = "Expected and actual type of returned ContactAction instance are different";
-
-        final ContactAction action = factory.defineContactAction(restUrl);
-        Assert.assertTrue(errorMessage, action.getClass() == DeletePhoneFromContactAction.class);
     }
 
     @Test
@@ -119,17 +86,6 @@ public class ContactActionFactoryTest {
     }
 
     @Test
-    public void defineUpdateAttachmentFromContactActionTest() throws Exception {
-        final String restUrl = "update_attachment_from_contact";
-
-        final String errorMessage
-                = "Expected and actual type of returned ContactAction instance are different";
-
-        final ContactAction action = factory.defineContactAction(restUrl);
-        Assert.assertTrue(errorMessage, action.getClass() == UpdateAttachmentFromContactAction.class);
-    }
-
-    @Test
     public void defineUpdateContactActionTest() throws Exception {
         final String restUrl = "update_contact";
 
@@ -138,17 +94,6 @@ public class ContactActionFactoryTest {
 
         final ContactAction action = factory.defineContactAction(restUrl);
         Assert.assertTrue(errorMessage, action.getClass() == UpdateContactAction.class);
-    }
-
-    @Test
-    public void defineUpdatePhoneFromContactActionTest() throws Exception {
-        final String restUrl = "update_phone_from_contact";
-
-        final String errorMessage
-                = "Expected and actual type of returned ContactAction instance are different";
-
-        final ContactAction action = factory.defineContactAction(restUrl);
-        Assert.assertTrue(errorMessage, action.getClass() == UpdatePhoneFromContactAction.class);
     }
 
     @Test
