@@ -1,14 +1,18 @@
 package com.itechart.app.model.actions;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.itechart.app.controller.utils.RequestContent;
 import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.dao.JdbcContactDao;
 import com.itechart.app.model.entities.Attachment;
 import com.itechart.app.model.entities.Contact;
+import com.itechart.app.model.entities.Phone;
 import com.itechart.app.model.utils.PageConfigurationManager;
 import org.apache.commons.fileupload.FileItem;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.*;
 
 public class AddAttachmentToContactAction implements ContactAction{
@@ -23,6 +27,10 @@ public class AddAttachmentToContactAction implements ContactAction{
 
     private static final String COMMENT_PARAM = "comment";
 
+    private static final String PHONES_PARAM = "phones";
+
+    private static final String ATTACHMENTS_PARAM = "attachments";
+
     private final static String ERROR_PAGE_NAME = "path.page.jsp.error";
 
     private final static String CONTACT_DETAIL_PAGE_NAME = "path.page.jsp.contact-detail";
@@ -34,12 +42,18 @@ public class AddAttachmentToContactAction implements ContactAction{
         Iterator fileItemIterator = items.iterator();
 
         Map<String, String> properties = new HashMap<>(ATTACHMENT_PROPERTIES_COUNT);
-        Attachment attachment = new Attachment();
+        List<Attachment> attachments; Attachment attachment = new Attachment();
+        List<Phone> phones;
         while (fileItemIterator.hasNext()) {
             FileItem item = (FileItem) fileItemIterator.next();
-
             if (item.isFormField()) {
-                properties.put(item.getFieldName(), item.getString());
+                if(item.getFieldName().equals(PHONES_PARAM)){
+                    phones = parsePhones(item);
+                } else if (item.getFieldName().equals(ATTACHMENTS_PARAM)){
+                    attachments = parseAttachments(item);
+                } else {
+                    properties.put(item.getFieldName(), item.getString());
+                }
             } else {
                 try {
                     attachment.setFileStream(item.getInputStream());
@@ -67,5 +81,18 @@ public class AddAttachmentToContactAction implements ContactAction{
             dao.closeConnection();
         }
         return page;
+    }
+
+    private List<Phone> parsePhones(FileItem item) {
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<Phone>>(){}.getType();
+
+        // here method getString() from FileItem should return JSON string
+        List<Phone> phones = gson.fromJson(item.getString(), type);
+        return phones;
+    }
+
+    private List<Attachment> parseAttachments(FileItem item) {
+        return null;
     }
 }
