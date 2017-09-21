@@ -3,7 +3,7 @@ Web app designed to manage user contacts, sending emails.
 
 # Used technologies
 - Java EE technologies (Servlets, filters, jsp, jstl etc)
-- Quarts Job Sheduler
+- Quartz Job Sheduler
 - String Template
 - Twitter bootstrap
 - JUnit/Mockito for testing
