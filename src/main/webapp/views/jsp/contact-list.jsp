@@ -34,10 +34,13 @@
                 <h3>Your contacts</h3>
             </div>
         </div>
-        <button type="submit" class="btn btn-danger btn-md" onclick="deleteCheckedContacts()">
+        <button type="button" class="btn btn-danger btn-md" onclick="deleteCheckedContacts()">
             <i class="fa fa-trash-o fa-lg" aria-hidden="true"></i> Delete
         </button>
-        <button type="submit" class="btn btn-info btn-md" onclick="">
+        <a type="button" class="btn btn-warning btn-md" href="${createContactUrl}">
+            <i class="fa fa-pencil fa-lg" aria-hidden="true"></i> New contact
+        </a>
+        <button type="button" class="btn btn-info btn-md" onclick="">
             <i class="fa fa-envelope-o fa-lg" aria-hidden="true"></i> Send email
         </button>
         <hr>
@@ -56,7 +59,7 @@
             <tbody>
             <c:forEach var="contact" items="${contactList}">
                 <tr>
-                    <td><input type="checkbox" name="selected_contacts" value="${contact.contactId}" /></td>
+                    <td><input type="checkbox" name="selected_contacts" value="${contact.contactId}"  /></td>
                     <td><a href="${getContactByIdUrl}${contact.contactId}">
                         <c:out value="${contact.firstName} ${contact.patronymic} ${contact.surname}"/>
                     </a></td>
