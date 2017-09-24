@@ -27,9 +27,9 @@ id_nationality, id_marital_status) values
 "2017-07-04", "test website", "test email", 1, 1, 1, 1, 1);
 
 insert into phone_types(phone_type) values
-("mobile"),
-("home"),
-("working");
+("Mobile"),
+("Home"),
+("Working");
 
 insert into photos(id_contact) values
 (1);

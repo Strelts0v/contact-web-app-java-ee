@@ -29,7 +29,7 @@
 
         <!-- left side -->
         <div class="col-sm-2 text-center">
-            <div class="well">
+            <div class="well" id="contact-photo" onclick="showPhotoModal()">
                 <img src="../../pictures/no-person.jpg" class="img-circle" height="150" width="150" alt="Avatar">
             </div>
             <div class="alert alert-success">
@@ -229,13 +229,16 @@
                 <a href="#" class="btn btn-warning btn-sm control-button" role="button">
                     <i class="fa fa-pencil fa-lg" aria-hidden="true"></i> Edit
                 </a>
-                <a href="#" class="btn btn-success btn-sm control-button" id="add-attachment-button" role="button">
+                <a href="#" class="btn btn-success btn-sm control-button" role="button"
+                   onclick="showAttachmentModal(addAttachment)">
                     <i class="fa fa-plus" aria-hidden="true"></i> Add
                 </a>
 
                 <table class="table table-bordered">
                     <thead>
                     <tr>
+                        <th><input type="checkbox" id="check-all-attachments"
+                                   onclick="setCheckboxesChecked('check-all-attachments' , 'is_attachment_selected')"></th>
                         <th>File name</th>
                         <th>Download date</th>
                         <th>Comment</th>
@@ -244,9 +247,20 @@
                     <tbody id="attachment-table-body">
                     <c:forEach var="attachment" items="${contact.attachments}">
                         <tr>
+                            <td><input type="checkbox" name="is_attachment_selected" value="${attachment.attachmentId}"/></td>
                             <td>${attachment.fileName}</td>
                             <td>${attachment.downloadDate}</td>
                             <td>${attachment.comment}</td>
+                            <td class="col-xs-2">
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-danger" onclick="deleteAttachment(this)">
+                                        <i class="fa fa-trash-o fa-lg"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-warning" onclick="showAttachmentModal(editAttachment, this)">
+                                        <i class="fa fa-pencil fa-lg"></i>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     </c:forEach>
                     </tbody>
@@ -262,26 +276,37 @@
                 <a href="#" class="btn btn-warning btn-sm control-button" role="button">
                     <i class="fa fa-pencil fa-lg" aria-hidden="true"></i> Edit
                 </a>
-                <a href="#" class="btn btn-success btn-sm control-button" role="button">
+                <a href="#" class="btn btn-success btn-sm control-button" role="button" onclick="showPhoneModal()">
                     <i class="fa fa-plus" aria-hidden="true"></i> Add
                 </a>
 
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>Select all</th>
+                        <th><input type="checkbox" id="check-all-phones"
+                                   onclick="setCheckboxesChecked('check-all-phones' , 'is_phone_selected')"></th>
                         <th>Phone number</th>
                         <th>Phone type</th>
                         <th>Comment</th>
                     </tr>
                     </thead>
-                    <tbody id="phones-table-body">
+                    <tbody id="phone-table-body">
                     <c:forEach var="phone" items="${contact.phones}">
                         <tr class="phoneItem">
-                            <td><input type="checkbox" value="${phone.phoneId}" /></td>
+                            <td><input type="checkbox" name="is_phone_selected" value="${phone.phoneId}"/></td>
                             <td>${phone.phoneNumber}</td>
                             <td>${phone.phoneType}</td>
                             <td>${phone.comment}</td>
+                            <td class="col-xs-2">
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-danger" onclick="deletePhone(this)">
+                                        <i class="fa fa-trash-o fa-lg"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-warning" onclick="showPhoneModal(editPhone, this)">
+                                        <i class="fa fa-pencil fa-lg"></i>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     </c:forEach>
                     </tbody>
@@ -292,33 +317,98 @@
 
     <!-- Modals -->
 
-    <!-- Modal for uploading attachments -->
-    <div id="fileUploadModal" class="modal">
-
+    <!-- Modal for adding/updating attachments -->
+    <div id="attachment-modal" class="modal">
         <!-- Modal content -->
         <div class="modal-content">
             <div class="modal-header">
-                <span class="close">&times;</span>
-                <h2>Select file</h2>
+                <span class="close" onclick="closeAttachmentModal()">&times;</span>
+                <h2>Attachment form</h2>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="attachment_name">Attachment name: </label>
-                    <input type="text" class="form-control" id="attachment_name" name="attachment_name">
+                    <label for="attachment-name">Attachment name: </label>
+                    <input type="text" class="form-control" id="attachment-name" name="attachment-name">
                 </div>
 
                 <div class="form-group">
-                    <label for="comment">Comment: </label>
-                    <input type="text" class="form-control" id="comment" name="comment">
+                    <label for="attachment-comment">Comment: </label>
+                    <input type="text" class="form-control" id="attachment-comment" name="attachment-comment">
                 </div>
 
-                <label for="upload_file">Select attachment: </label>
-                <input type="file" class="file" id="upload_file" name="upload_file" value="Select file">
+                <label for="upload-attachment">Select attachment: </label>
+                <input type="file" class="file" id="upload-attachment" name="upload-attachment" value="Select attachment">
             </div>
             <div class="modal-footer">
                 <h3>Modal Footer</h3>
-                <button type="button" class="btn btn-success btn-md" onclick="addAttachment()">Add</button>
+                <button type="button" class="btn btn-success btn-md" id="attachment-ok-button" onclick="">OK</button>
                 <button type="button" class="btn btn-danger btn-md" onclick="cancelAttachment()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding/updating phones -->
+    <div id="phone-modal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closePhoneModal()">&times;</span>
+                <h2>Phone form</h2>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="country-code">Country code: </label>
+                    <input type="text" class="form-control" id="country-code" name="country-code">
+                </div>
+
+                <div class="form-group">
+                    <label for="operator-code">Operator code: </label>
+                    <input type="text" class="form-control" id="operator-code" name="operator-code">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone-number">Phone number: </label>
+                    <input type="text" class="form-control" id="phone-number" name="phone-number">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone-type">Phone type: </label>
+                    <select class="form-control" id="phone-type" name="phone-type">
+                        <option selected>Mobile</option>
+                        <option>Working</option>
+                        <option>Home</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone-comment">Comment: </label>
+                    <input type="text" class="form-control" id="phone-comment" name="phone-comment">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <h3>Modal Footer</h3>
+                <button type="button" class="btn btn-success btn-md" id="phone-ok-button" onclick="addPhone()">Ok</button>
+                <button type="button" class="btn btn-danger btn-md" onclick="cancelPhone()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding/updating contact photo -->
+    <div id="photo-modal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closePhotoModal()">&times;</span>
+                <h2>Photo form</h2>
+            </div>
+            <div class="modal-body">
+                <label for="upload-photo">Find photo: </label>
+                <input type="file" class="file" id="upload-photo" name="upload-photo" value="Find photo">
+            </div>
+            <div class="modal-footer">
+                <h3>Modal Footer</h3>
+                <button type="button" class="btn btn-success btn-md" id="photo-ok-button" onclick="savePhoto()">Save</button>
+                <button type="button" class="btn btn-danger btn-md" onclick="cancelPhoto()">Cancel</button>
             </div>
         </div>
     </div>

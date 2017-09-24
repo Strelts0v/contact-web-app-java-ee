@@ -18,19 +18,14 @@ public class RestRequest {
     // initialize all patterns according REST API
     {
         patterns = new ArrayList<>();
-        patterns.add(Pattern.compile("/add_attachment_to_contact"));
-        patterns.add(Pattern.compile("/add_phone_to_contact"));
         patterns.add(Pattern.compile("/create_contact"));
-        patterns.add(Pattern.compile("/delete_attachment_from_contact"));
         patterns.add(Pattern.compile("/delete_contact"));
-        patterns.add(Pattern.compile("/delete_phone_from_contact"));
         patterns.add(Pattern.compile("/get_contact/([0-9]*)"));
         patterns.add(Pattern.compile("/get_contacts"));
         patterns.add(Pattern.compile("/search_contact"));
         patterns.add(Pattern.compile("/send_email_to_contacts"));
-        patterns.add(Pattern.compile("/update_attachment_from_contact"));
         patterns.add(Pattern.compile("/update_contact"));
-        patterns.add(Pattern.compile("/update_phone_from_contact"));
+        patterns.add(Pattern.compile("/add_attachment_to_contact"));
     }
 
 

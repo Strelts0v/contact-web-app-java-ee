@@ -45,10 +45,10 @@
         </button>
         <hr>
 
-        <table class="table table-bordred table-striped">
+        <table class="table table-striped">
             <thead>
             <tr>
-                <th><input type="checkbox" id="checkall" /></th>
+                <th><input type="checkbox" id="check-all-contacts" onclick="setAllContactsChecked()" /></th>
                 <th>Full name</th>
                 <th>Birthday</th>
                 <th>Address</th>
@@ -59,13 +59,26 @@
             <tbody>
             <c:forEach var="contact" items="${contactList}">
                 <tr>
-                    <td><input type="checkbox" name="selected_contacts" value="${contact.contactId}"  /></td>
+                    <td><input type="checkbox" name="is_contact_selected" value="${contact.contactId}"/></td>
                     <td><a href="${getContactByIdUrl}${contact.contactId}">
                         <c:out value="${contact.firstName} ${contact.patronymic} ${contact.surname}"/>
                     </a></td>
                     <td><c:out value="${contact.birthday}"/></td>
                     <td><c:out value="${contact.address.country}, ${contact.address.city}, ${contact.address.address}, ${contact.address.index}"/></td>
                     <td><c:out value="${contact.company}"/></td>
+                    <td class="col-xs-2">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-danger" onclick="">
+                                <i class="fa fa-trash-o fa-lg"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="">
+                                <i class="fa fa-pencil fa-lg"></i>
+                            </button>
+                            <button class="btn btn-sm btn-info">
+                                <i class="fa fa-envelope-o fa-lg"></i>
+                            </button>
+                        </div>
+                    </td>
                 </tr>
             </c:forEach>
             </tbody>
@@ -80,7 +93,8 @@
 
             <%--For displaying Previous link except for the 1st page --%>
             <li class="<c:if test="${currentPage == 1}">disabled</c:if>">
-                <a href="${getContactPageUrl}${currentPage - 1}">
+                <a href="<c:if test="${currentPage != 1}">${getContactPageUrl}${currentPage - 1}</c:if>"
+                   class="<c:if test="${currentPage == 1}">disabled</c:if>">
                     <i class="fa fa-arrow-left" aria-hidden="true"></i>
                 </a>
             </li>
@@ -99,7 +113,8 @@
 
             <%--For displaying Next link --%>
             <li class="<c:if test="${currentPage == pageCount}">disabled</c:if>">
-                <a href="${getContactPageUrl}${currentPage + 1}">
+                <a href="<c:if test="${currentPage != pageCount}">${getContactPageUrl}${currentPage + 1}</c:if>"
+                   class="<c:if test="${currentPage == pageCount}">disabled</c:if>">
                     <i class="fa fa-arrow-right" aria-hidden="true"></i>
                 </a>
             </li>
@@ -110,22 +125,6 @@
 <!-- /.container -->
 
 <!-- Javascript functions -->
-<script>
-    function deleteCheckedContacts(){
-        var checkBoxesName = "selected_contacts";
-        var checkBoxes = document.getElementsByName(checkBoxesName);
-        var checkBoxesChecked = [];
-        // loop over them all
-        for (var i = 0; i < checkBoxes.length; i++) {
-            // And stick the checked ones onto an array...
-            if (checkBoxes[i].checked) {
-                checkBoxesChecked.push(checkBoxes[i].value);
-            }
-        }
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '${deleteContactsUrl}?selectedContacts=' + checkBoxesChecked, false);
-        xhr.send();
-    }
-</script>
+<script src="../../js/contact-list.js"></script>
 </html>
 
