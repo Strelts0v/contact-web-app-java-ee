@@ -186,7 +186,7 @@
                 <label for="country">Country: </label>
                 <input type="text" class="form-control" id="country" name="country"
                 <c:if test="${not empty contact}">
-                       value="${contact.address.country}"
+                       value="${contact.country}"
                 </c:if>
                 >
             </div>
@@ -194,7 +194,7 @@
                 <label for="city">City: </label>
                 <input type="text" class="form-control" id="city" name="city"
                 <c:if test="${not empty contact}">
-                       value="${contact.address.city}"
+                       value="${contact.city}"
                 </c:if>
                 >
             </div>
@@ -203,7 +203,7 @@
                 <label for="address">Address: </label>
                 <input type="text" class="form-control" id="address" name="address"
                 <c:if test="${not empty contact}">
-                       value="${contact.address.address}"
+                       value="${contact.address}"
                 </c:if>
                 >
             </div>
@@ -212,7 +212,7 @@
                 <label for="index">Index: </label>
                 <input type="text" class="form-control" id="index" name="index"
                 <c:if test="${not empty contact}">
-                       value="${contact.address.index}"
+                       value="${contact.indexNumber}"
                 </c:if>
                 >
             </div>
@@ -223,10 +223,12 @@
             <div class="thumbnail info-table-area">
                 <h3>Attachment table</h3>
 
-                <a href="#" class="btn btn-danger btn-sm control-button" id="" role="button">
+                <a href="#" class="btn btn-danger btn-sm control-button"
+                   onclick="deleteCheckedAttachments('is_attachment_selected')" role="button">
                     <i class="fa fa-trash-o fa-lg" aria-hidden="true"></i> Delete
                 </a>
-                <a href="#" class="btn btn-warning btn-sm control-button" role="button">
+                <a href="#" class="btn btn-warning btn-sm control-button" role="button"
+                    onclick="editCheckedAttachments('is_attachment_selected')">
                     <i class="fa fa-pencil fa-lg" aria-hidden="true"></i> Edit
                 </a>
                 <a href="#" class="btn btn-success btn-sm control-button" role="button"
@@ -253,11 +255,14 @@
                             <td>${attachment.comment}</td>
                             <td class="col-xs-2">
                                 <div class="btn-group">
-                                    <button class="btn btn-sm btn-danger" onclick="deleteAttachment(this)">
+                                    <button class="btn btn-xs btn-danger" onclick="deleteAttachment(this)">
                                         <i class="fa fa-trash-o fa-lg"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-warning" onclick="showAttachmentModal(editAttachment, this)">
+                                    <button class="btn btn-xs btn-warning" onclick="showAttachmentModal(editAttachment, this)">
                                         <i class="fa fa-pencil fa-lg"></i>
+                                    </button>
+                                    <button class="btn btn-xs btn-info" onclick="downloadAttachment(this)">
+                                        <i class="fa fa-download fa-lg"></i>
                                     </button>
                                 </div>
                             </td>
@@ -270,13 +275,16 @@
             <div class="thumbnail info-table-area">
                 <h3>Phones table</h3>
 
-                <a href="#" class="btn btn-danger btn-sm control-button" role="button">
+                <a href="#" class="btn btn-danger btn-sm control-button" role="button"
+                   onclick="deleteCheckedPhones('is_phone_selected')">
                     <i class="fa fa-trash-o fa-lg" aria-hidden="true"></i> Delete
                 </a>
-                <a href="#" class="btn btn-warning btn-sm control-button" role="button">
+                <a href="#" class="btn btn-warning btn-sm control-button" role="button"
+                    onclick="editCheckedPhones('is_phone_selected')">
                     <i class="fa fa-pencil fa-lg" aria-hidden="true"></i> Edit
                 </a>
-                <a href="#" class="btn btn-success btn-sm control-button" role="button" onclick="showPhoneModal()">
+                <a href="#" class="btn btn-success btn-sm control-button" role="button"
+                   onclick="showPhoneModal()">
                     <i class="fa fa-plus" aria-hidden="true"></i> Add
                 </a>
 
