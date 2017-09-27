@@ -5,23 +5,22 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.InputStream;
-import java.util.Date;
 
 public class Attachment {
 
-    private long attachmentId;
+    private int attachmentId;
 
-    private long contactId;
+    private int contactId;
 
     private String fileName;
 
-    private Date downloadDate;
+    private String downloadDate;
 
     private String comment;
 
     private InputStream fileStream;
 
-    private long fileSize;
+    private int fileSize;
 
     public final static Attachment EMPTY_ATTACHMENT;
 
@@ -29,19 +28,19 @@ public class Attachment {
         EMPTY_ATTACHMENT = new Attachment();
     }
 
-    public long getAttachmentId() {
+    public int getAttachmentId() {
         return attachmentId;
     }
 
-    public void setAttachmentId(long attachmentId) {
+    public void setAttachmentId(int attachmentId) {
         this.attachmentId = attachmentId;
     }
 
-    public long getContactId() {
+    public int getContactId() {
         return contactId;
     }
 
-    public void setContactId(long contactId) {
+    public void setContactId(int contactId) {
         this.contactId = contactId;
     }
 
@@ -53,11 +52,11 @@ public class Attachment {
         this.fileName = fileName;
     }
 
-    public Date getDownloadDate() {
+    public String getDownloadDate() {
         return downloadDate;
     }
 
-    public void setDownloadDate(Date downloadDate) {
+    public void setDownloadDate(String downloadDate) {
         this.downloadDate = downloadDate;
     }
 
@@ -77,11 +76,11 @@ public class Attachment {
         this.fileStream = fileStream;
     }
 
-    public long getFileSize() {
+    public int getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(long fileSize) {
+    public void setFileSize(int fileSize) {
         this.fileSize = fileSize;
     }
 
