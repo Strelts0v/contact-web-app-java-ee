@@ -8,9 +8,11 @@ import java.io.InputStream;
 
 public class Photo {
 
-    private long photoId;
+    private int photoId;
 
     private InputStream photoStream;
+
+    private int photoSize;
 
     public final static Photo EMPTY_PHOTO;
 
@@ -18,11 +20,11 @@ public class Photo {
         EMPTY_PHOTO = new Photo();
     }
 
-    public long getPhotoId() {
+    public int getPhotoId() {
         return photoId;
     }
 
-    public void setPhotoId(long photoId) {
+    public void setPhotoId(int photoId) {
         this.photoId = photoId;
     }
 
@@ -32,6 +34,14 @@ public class Photo {
 
     public void setPhotoStream(InputStream photoStream) {
         this.photoStream = photoStream;
+    }
+
+    public int getPhotoSize() {
+        return photoSize;
+    }
+
+    public void setPhotoSize(int photoSize) {
+        this.photoSize = photoSize;
     }
 
     @Override
