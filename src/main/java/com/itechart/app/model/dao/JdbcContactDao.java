@@ -2,6 +2,7 @@ package com.itechart.app.model.dao;
 
 import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.entities.*;
+import com.itechart.app.model.exceptions.ContactDaoException;
 import com.itechart.app.model.utils.DatabaseConnectionManager;
 
 import java.sql.*;
@@ -15,8 +16,22 @@ public class JdbcContactDao implements ContactDao {
 
     private Connection connection;
 
+    private Savepoint initialSavePoint;
+
     private JdbcContactDao(Connection connection){
         this.connection = connection;
+    }
+
+    @Override
+    public void initializeDao() throws ContactDaoException{
+        try{
+            connection.setAutoCommit(false);
+            this.initialSavePoint = connection.setSavepoint();
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            closeConnection(connection);
+            throw new ContactDaoException(sqle);
+        }
     }
 
     /**
@@ -25,84 +40,66 @@ public class JdbcContactDao implements ContactDao {
      * @throws SQLException when there is no available Connection
      * or DatabaseConnectionManager
      */
-    public static JdbcContactDao newInstance() {
+    public static JdbcContactDao newInstance() throws ContactDaoException {
         DatabaseConnectionManager manager = DatabaseConnectionManager.getInstance();
         Connection connection;
-        JdbcContactDao dao = null;
         try {
             if (manager == null) {
-                throw new SQLException();
+                throw new ContactDaoException("Cannot get DatabaseConnectionManager object");
             }
             connection = manager.getConnection();
-            dao = new JdbcContactDao(connection);
-        } catch (SQLException e){
-            AppLogger.error(e.getMessage());
-        } finally {
-            return dao;
+            if (connection == null) {
+                throw new ContactDaoException("Cannot get Connection object from DatabaseConnectionManager object");
+            }
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
         }
+        return new JdbcContactDao(connection);
     }
 
     @Override
-    public Contact createContact(Contact contact) {
+    public Contact createContact(Contact contact) throws ContactDaoException{
         try {
-            connection.setAutoCommit(false);
-
-            int addressId = getContactAddressId(contact);
+            // get correspond ids of contact properties
             int companyId = getContactCompanyId(contact);
-            int genderId = getContactGenderId(contact);
             int nationalityId = getContactNationalityId(contact);
-            int maritalStatusId = getContactMaritalStatusId(contact);
+            int photoId = getContactPhotoId(contact);
+            contact.getPhoto().setPhotoId(photoId);
 
-            int contactId = addContactToDatabase(contact, addressId, companyId,
-                    genderId, nationalityId, maritalStatusId);
+            // add contact properties to database
+            int contactId = addContactToDatabase(contact, companyId, nationalityId, photoId);
             contact.setContactId(contactId);
 
-            connection.commit();
-        } catch (SQLException e){
-            AppLogger.error(e.getMessage());
-            if(connection != null){
-                try{
-                    connection.rollback();
-                } catch (SQLException ex){
-                    AppLogger.error(ex.getMessage());
-                }
+            // add attachments of contact to database
+            List<Attachment> attachments = contact.getAttachments();
+            for(Attachment attachment : attachments){
+                int attachmentId = addAttachmentToContact(contactId, attachment);
+                attachment.setAttachmentId(attachmentId);
             }
-        } finally {
-            return contact;
+
+            // add phones of contact to database
+            List<Phone> phones = contact.getPhones();
+            for(Phone phone : phones){
+                int phoneId = addPhoneToContact(contactId, phone);
+                phone.setPhoneId(phoneId);
+            }
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
         }
-    }
-
-    /**
-     * creates new address in database
-     * @param contact data transfer object
-     * @return - id of created address
-     * @throws SQLException - if creating of address is failed
-     */
-    private int getContactAddressId(final Contact contact) throws SQLException{
-        final String addAddressSqlQuery = "INSERT INTO addresses (country, city, address, index_number)"
-                + " VALUES (?, ?, ?, ?)";
-
-        final String addressIdName = "id_address";
-
-        final String[] values = {
-                contact.getAddress().getCountry(),
-                contact.getAddress().getCity(),
-                contact.getAddress().getAddress(),
-                contact.getAddress().getIndex()
-        };
-
-        return createNewRecordTemplate(addAddressSqlQuery, addressIdName, values);
+        return contact;
     }
 
     private int getContactCompanyId(final Contact contact) throws SQLException{
         // first try to find existed company with such name
 
         // make searching case-insensitive
-        final String findExistedCompanySqlQuery = "SELECT id_company FROM companies "
+        final String findExistedCompanySqlQuery =
+                "SELECT id_company FROM companies "
                 + "WHERE company COLLATE UTF8_GENERAL_CI = ?";
 
         final String idName = "id_company";
-
         try {
             return findIdByValueTemplate(findExistedCompanySqlQuery, idName, contact.getCompany());
         } catch (SQLException e){
@@ -110,25 +107,12 @@ public class JdbcContactDao implements ContactDao {
         }
 
         // if not create new company in database
-
         final String insertCompanySqlQuery = "INSERT INTO companies(company) VALUES (?)";
 
         final String companyIdName = "id_company";
-
         final String[] values = { contact.getCompany()};
 
         return createNewRecordTemplate(insertCompanySqlQuery, companyIdName, values);
-    }
-
-    private int getContactGenderId(final Contact contact) throws SQLException {
-        // make searching case-insensitive
-        final String findExistedGenderSqlQuery =
-                "SELECT id_gender FROM genders \n" +
-                "WHERE gender COLLATE UTF8_GENERAL_CI = ?";
-
-        final String idName = "id_gender";
-
-        return findIdByValueTemplate(findExistedGenderSqlQuery, idName, contact.getGender());
     }
 
     private int getContactNationalityId(final Contact contact) throws SQLException{
@@ -138,7 +122,6 @@ public class JdbcContactDao implements ContactDao {
         final String findExistedNationalitySqlQuery =
                 "SELECT id_nationality FROM nationalities \n" +
                 "WHERE nationality COLLATE UTF8_GENERAL_CI = ?";
-
         final String idName = "id_nationality";
 
         try {
@@ -148,30 +131,44 @@ public class JdbcContactDao implements ContactDao {
         }
 
         // if not create new nationality in database
-
         final String insertNewNationalityQuery = "INSERT INTO nationalities(nationality) VALUES (?)";
-
         final String nationalityIdName = "id_nationality";
-
         final String[] values = { contact.getNationality()};
 
         return createNewRecordTemplate(insertNewNationalityQuery, nationalityIdName, values);
     }
 
-    /**
-     * @return id of find marital status
-     * @throws SQLException if no such marital status in database
-     */
-    private int getContactMaritalStatusId(final Contact contact) throws SQLException{
-        // make searching case-insensitive
-        final String findExistedNationalitySqlQuery =
-                "SELECT id_marital_status FROM marital_status \n" +
-                "WHERE marital_status_name COLLATE UTF8_GENERAL_CI = ?";
+    private int getContactPhotoId(Contact contact) throws SQLException{
+        final String insertNewPhotoQuery = "INSERT INTO photos(photo) VALUES (?)";
+        final String photoIdName = "id_photo";
 
-        final String idName = "id_marital_status";
+        int generatedRecordId;
+        PreparedStatement insertNewPhotoStmt = null;
 
-        return findIdByValueTemplate(findExistedNationalitySqlQuery, idName, contact.getMaritalStatus());
+        try {
+            insertNewPhotoStmt = connection.prepareStatement(insertNewPhotoQuery,
+                    Statement.RETURN_GENERATED_KEYS);
+            insertNewPhotoStmt.setBinaryStream(1, contact.getPhoto().getPhotoStream(),
+                    contact.getPhoto().getPhotoSize());
+
+            int affectedRows = insertNewPhotoStmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating of new record in photos table is failed, no rows affected");
+            }
+
+            ResultSet generatedKeys = insertNewPhotoStmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                generatedRecordId = generatedKeys.getInt(1);
+            } else {
+                throw new SQLException("Creating of new record in photos table is failed," +
+                        " no ID (" + photoIdName + ") obtained ");
+            }
+        }finally {
+            closeStatement(insertNewPhotoStmt);
+        }
+        return generatedRecordId;
     }
+
 
     /**
      * @return id of find record
@@ -180,16 +177,21 @@ public class JdbcContactDao implements ContactDao {
     private int findIdByValueTemplate(final String selectSqlQuery, final String idName,
                                       final String searchValue) throws SQLException{
         int id;
-        PreparedStatement findExistedIdStmt;
+        PreparedStatement findExistedIdStmt = null;
 
-        findExistedIdStmt = connection.prepareStatement(selectSqlQuery);
-        findExistedIdStmt.setString(1, searchValue);
+        try {
+            findExistedIdStmt = connection.prepareStatement(selectSqlQuery);
+            findExistedIdStmt.setString(1, searchValue);
 
-        ResultSet resultSet = findExistedIdStmt.executeQuery();
-        if(resultSet.next()){
-            id = resultSet.getInt(idName);
-        } else {
-            throw new SQLException("Cannot find " + idName + " according value " + searchValue);
+            ResultSet resultSet = findExistedIdStmt.executeQuery();
+            findExistedIdStmt.close();
+            if (resultSet.next()) {
+                id = resultSet.getInt(idName);
+            } else {
+                throw new SQLException("Cannot find " + idName + " according value " + searchValue);
+            }
+        } finally {
+            closeStatement(findExistedIdStmt);
         }
         return id;
     }
@@ -201,27 +203,31 @@ public class JdbcContactDao implements ContactDao {
     private int createNewRecordTemplate(final String insertSqlQuery, final String idName,
                                         final String[] values) throws SQLException {
         int generatedRecordId;
-        PreparedStatement insertStmt;
+        PreparedStatement insertStmt = null;
 
-        insertStmt = connection.prepareStatement(insertSqlQuery,
-                Statement.RETURN_GENERATED_KEYS);
+        try {
+            insertStmt = connection.prepareStatement(insertSqlQuery,
+                    Statement.RETURN_GENERATED_KEYS);
 
-        // insert values in statement
-        for(int i = 1; i < values.length + 1; i++){
-            insertStmt.setString(i, values[i-1]);
-        }
+            // insert values in statement
+            for (int i = 1; i < values.length + 1; i++) {
+                insertStmt.setString(i, values[i - 1]);
+            }
 
-        int affectedRows = insertStmt.executeUpdate();
-        if(affectedRows == 0){
-            throw new SQLException("Creating of new record is failed, no rows affected");
-        }
+            int affectedRows = insertStmt.executeUpdate();
+            if (affectedRows == 0) {
+                insertStmt.close();
+                throw new SQLException("Creating of new record is failed, no rows affected");
+            }
 
-        ResultSet generatedKeys = insertStmt.getGeneratedKeys();
-        if(generatedKeys.next()){
-            generatedRecordId = generatedKeys.getInt(1);
-        }
-        else {
-            throw new SQLException("Creating of new record is failed, no ID (" + idName + ") obtained ");
+            ResultSet generatedKeys = insertStmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                generatedRecordId = generatedKeys.getInt(1);
+            } else {
+                throw new SQLException("Creating of new record is failed, no ID (" + idName + ") obtained ");
+            }
+        } finally {
+            closeStatement(insertStmt);
         }
         return generatedRecordId;
     }
@@ -230,155 +236,167 @@ public class JdbcContactDao implements ContactDao {
      * @return id of created contact
      * @throws SQLException if creating of new contact is failed
      */
-    private int addContactToDatabase(final Contact contact, final int addressId, final int companyId,
-                                     final int genderId, final int nationalityId, final int maritalStatusId)
-            throws SQLException {
-
+    private int addContactToDatabase(final Contact contact, final int companyId,
+                                     final int nationalityId, final int photoId) throws SQLException {
         int contactId;
-        PreparedStatement addContactStmt;
+        PreparedStatement addContactStmt = null;
 
-        final String addContactSqlQuery = "INSERT INTO contacts(first_name, surname, patronymic, birthday, \n"
-                + "website, email, id_address, id_company, id_gender, id_nationality, id_marital_status) \n"
-                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        final String addContactSqlQuery =
+                "INSERT INTO contacts(first_name, surname, patronymic, birthday, \n"
+                + "website, email, country, city, address, index_number, gender, marital_status, id_nationality,\n"
+                + "id_company, id_photo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        addContactStmt = connection.prepareStatement(addContactSqlQuery,
-                Statement.RETURN_GENERATED_KEYS);
+        try {
+            addContactStmt = connection.prepareStatement(addContactSqlQuery,
+                    Statement.RETURN_GENERATED_KEYS);
 
-        addContactStmt.setString(1, contact.getFirstName());
-        addContactStmt.setString(2, contact.getSurname());
-        addContactStmt.setString(3, contact.getPatronymic());
-        addContactStmt.setDate(4, new java.sql.Date(contact.getBirthday().getTime()));
-        addContactStmt.setString(5, contact.getWebsite());
-        addContactStmt.setString(6, contact.getEmail());
-        addContactStmt.setInt(7, addressId);
-        addContactStmt.setInt(8, companyId);
-        addContactStmt.setInt(9, genderId);
-        addContactStmt.setInt(10, nationalityId);
-        addContactStmt.setInt(11, maritalStatusId);
+            addContactStmt.setString(1, contact.getFirstName());
+            addContactStmt.setString(2, contact.getSurname());
+            addContactStmt.setString(3, contact.getPatronymic());
+            addContactStmt.setDate(4, java.sql.Date.valueOf(contact.getBirthday()));
+            addContactStmt.setString(5, contact.getWebsite());
+            addContactStmt.setString(6, contact.getEmail());
+            addContactStmt.setString(7, contact.getCountry());
+            addContactStmt.setString(8, contact.getCity());
+            addContactStmt.setString(9, contact.getAddress());
+            addContactStmt.setString(10, contact.getIndexNumber());
+            addContactStmt.setString(11, contact.getGender());
+            addContactStmt.setString(12, contact.getMaritalStatus());
+            addContactStmt.setInt(13, nationalityId);
+            addContactStmt.setInt(14, companyId);
+            addContactStmt.setInt(15, photoId);
 
-        int affectedRows = addContactStmt.executeUpdate();
-        if(affectedRows == 0){
-            throw new SQLException("Creating of new contact is failed, no rows affected");
+            int affectedRows = addContactStmt.executeUpdate();
+            if (affectedRows == 0) {
+                addContactStmt.close();
+                throw new SQLException("Creating of new contact is failed, no rows affected");
+            }
+
+            ResultSet generatedKeys = addContactStmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                contactId = generatedKeys.getInt(1);
+            } else {
+                throw new SQLException("Creating of new contact is failed, no ID (id_contact) obtained ");
+            }
+        } finally {
+            closeStatement(addContactStmt);
         }
 
-        ResultSet generatedKeys = addContactStmt.getGeneratedKeys();
-        if(generatedKeys.next()){
-            contactId = generatedKeys.getInt(1);
-        }
-        else {
-            throw new SQLException("Creating of new contact is failed, no ID (id_contact) obtained ");
-        }
         return contactId;
     }
 
     @Override
-    public int updateContact(final int contactId, final Contact contact) {
+    public int updateContact(final int contactId, final Contact contact) throws ContactDaoException {
         int updatedRows = 0;
         try {
-            connection.setAutoCommit(false);
-
-            // get addressId of deleted contact
-            int addressId = getContactAddressId(contactId);
-            updatedRows += updateContactAddress(addressId, contact);
             updatedRows += updateContactInfo(contactId, contact);
 
-            connection.commit();
-        } catch (SQLException e){
-            AppLogger.error(e.getMessage());
-            updatedRows = 0;
-            if(connection != null){
-                try{
-                    connection.rollback();
-                } catch (SQLException ex){
-                    AppLogger.error(ex.getMessage());
+            // add new attachments and update existed
+            List<Attachment> attachments = contact.getAttachments();
+            for(Attachment attachment : attachments){
+                if(attachment.getAttachmentId() == 0){
+                    addAttachmentToContact(contactId, attachment);
+                } else {
+                    updateAttachmentFromContact(attachment.getAttachmentId(), attachment);
                 }
             }
-        } finally {
-            return updatedRows;
+
+            // add new phones and update existed
+            List<Phone> phones = contact.getPhones();
+            for(Phone phone : phones){
+                if(phone.getPhoneId() == 0){
+                    addPhoneToContact(contactId, phone);
+                } else {
+                    updatePhoneFromContact(phone.getPhoneId(), phone);
+                }
+            }
+
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
         }
-    }
-
-    private int updateContactAddress(final int addressId, final Contact contact) throws SQLException{
-        PreparedStatement updateContactAddressStmt;
-
-        final String updateContactAddressSqlQuery =
-                "UPDATE addresses AS a set a.country = ?, a.city = ?, a.address = ?, a.index_number = ?\n" +
-                "where a.id_address = ?";
-
-        updateContactAddressStmt = connection.prepareStatement(updateContactAddressSqlQuery);
-        updateContactAddressStmt.setString(1, contact.getAddress().getCountry());
-        updateContactAddressStmt.setString(2, contact.getAddress().getCity());
-        updateContactAddressStmt.setString(3, contact.getAddress().getAddress());
-        updateContactAddressStmt.setString(4, contact.getAddress().getIndex());
-        updateContactAddressStmt.setInt(5, addressId);
-
-        return updateContactAddressStmt.executeUpdate();
+        return updatedRows;
     }
 
     private int updateContactInfo(final int contactId, final Contact contact) throws SQLException {
+        int rowsUpdated = 0;
         int companyId = getContactCompanyId(contact);
-        int genderId = getContactGenderId(contact);
         int nationalityId = getContactNationalityId(contact);
-        int maritalStatusId = getContactMaritalStatusId(contact);
+        rowsUpdated += updateContactPhoto(contact);
 
-        PreparedStatement updateContactInfoStmt;
+        PreparedStatement updateContactInfoStmt = null;
 
-        final String updateContactInfoSqlQuery =
-                "UPDATE contacts AS c set c.first_name = ?, c.surname = ?, c.patronymic = ?, \n" +
-                "c.birthday = ?, c.website = ?, c.email = ?, c.id_company = ?, c.id_gender = ?, \n" +
-                "c.id_nationality = ?, c.id_marital_status = ? \n" +
-                "where c.id_contact = ?";
+        try {
+            final String updateContactInfoSqlQuery =
+                    "UPDATE contacts AS c \n" +
+                            "SET c.first_name = ?, c.surname = ?, c.patronymic = ?, \n" +
+                            "c.birthday = ?, c.website = ?, c.email = ?, \n" +
+                            "c.country = ?, c.city = ?, c.address = ?, c.index_number = ?, \n" +
+                            "c.gender = ?, c.marital_status = ?, c.id_nationality = ?, \n" +
+                            "c.id_company = ? \n" +
+                            "WHERE c.id_contact = ?";
 
-        updateContactInfoStmt = connection.prepareStatement(updateContactInfoSqlQuery);
-        updateContactInfoStmt.setString(1, contact.getFirstName());
-        updateContactInfoStmt.setString(2, contact.getSurname());
-        updateContactInfoStmt.setString(3, contact.getPatronymic());
-        updateContactInfoStmt.setDate(4, new java.sql.Date(contact.getBirthday().getTime()));
-        updateContactInfoStmt.setString(5, contact.getWebsite());
-        updateContactInfoStmt.setString(6, contact.getEmail());
-        updateContactInfoStmt.setInt(7, companyId);
-        updateContactInfoStmt.setInt(8, genderId);
-        updateContactInfoStmt.setInt(9, nationalityId);
-        updateContactInfoStmt.setInt(10, maritalStatusId);
-        updateContactInfoStmt.setInt(11, contactId);
+            updateContactInfoStmt = connection.prepareStatement(updateContactInfoSqlQuery);
+            updateContactInfoStmt.setString(1, contact.getFirstName());
+            updateContactInfoStmt.setString(2, contact.getSurname());
+            updateContactInfoStmt.setString(3, contact.getPatronymic());
+            updateContactInfoStmt.setDate(4, java.sql.Date.valueOf(contact.getBirthday()));
+            updateContactInfoStmt.setString(5, contact.getWebsite());
+            updateContactInfoStmt.setString(6, contact.getEmail());
+            updateContactInfoStmt.setString(7, contact.getCountry());
+            updateContactInfoStmt.setString(8, contact.getCity());
+            updateContactInfoStmt.setString(9, contact.getAddress());
+            updateContactInfoStmt.setString(10, contact.getIndexNumber());
+            updateContactInfoStmt.setString(11, contact.getGender());
+            updateContactInfoStmt.setString(12, contact.getMaritalStatus());
+            updateContactInfoStmt.setInt(13, nationalityId);
+            updateContactInfoStmt.setInt(14, companyId);
+            updateContactInfoStmt.setInt(15, contactId);
 
-        return updateContactInfoStmt.executeUpdate();
+            rowsUpdated += updateContactInfoStmt.executeUpdate();
+        } finally {
+            closeStatement(updateContactInfoStmt);
+        }
+
+        return rowsUpdated;
+    }
+
+    private int updateContactPhoto(Contact contact) throws SQLException{
+        final String updateContactPhotoSqlQuery = "UPDATE photos SET photo = ? WHERE id_photo = ?";
+
+        PreparedStatement updateContactPhotoStmt = null;
+        int rowsUpdated;
+
+        try {
+            updateContactPhotoStmt = connection.prepareStatement(updateContactPhotoSqlQuery);
+            updateContactPhotoStmt.setBinaryStream(1, contact.getPhoto().getPhotoStream(),
+                    contact.getPhoto().getPhotoSize());
+            updateContactPhotoStmt.setInt(2, contact.getPhoto().getPhotoId());
+
+            rowsUpdated = updateContactPhotoStmt.executeUpdate();
+        } finally {
+            closeStatement(updateContactPhotoStmt);
+        }
+
+        return rowsUpdated;
     }
 
     @Override
-    public int deleteContact(final int contactId) {
+    public int deleteContact(final int contactId) throws ContactDaoException {
         int deletedRows = 0;
         try {
-            connection.setAutoCommit(false);
-
             deletedRows += deleteContactPhones(contactId);
             deletedRows += deleteContactAttachments(contactId);
-            deletedRows += deleteContactPhotos(contactId);
+            // before delete contactInfo get photoId
+            int photoId = getContactPhotoId(contactId);
 
-            // get addressId of deleted contact
-            int addressId = getContactAddressId(contactId);
             deletedRows += deleteContactInfo(contactId);
-            deletedRows += deleteContactAddress(addressId);
-
-            connection.commit();
-        } catch (SQLException e){
-            AppLogger.error(e.getMessage());
-            deletedRows = 0;
-            if(connection != null){
-                try{
-                    connection.rollback();
-                } catch (SQLException ex){
-                    AppLogger.error(ex.getMessage());
-                }
-            }
-        } finally {
-            return deletedRows;
+            deletedRows += deleteContactPhoto(photoId);
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
         }
-    }
-
-    private int deleteContactAddress(int addressId) throws SQLException {
-        final String deleteContactAddressSqlQuery = "DELETE FROM addresses WHERE id_address = ?";
-        return deleteRowsByIdTemplate(deleteContactAddressSqlQuery, addressId);
+        return deletedRows;
     }
 
     private int deleteContactInfo(int contactId) throws SQLException {
@@ -386,9 +404,30 @@ public class JdbcContactDao implements ContactDao {
         return deleteRowsByIdTemplate(deleteContactInfoSqlQuery, contactId);
     }
 
-    private int deleteContactPhotos(int contactId) throws SQLException {
-        final String deleteContactPhotosSqlQuery = "DELETE FROM photos WHERE id_contact = ?";
-        return deleteRowsByIdTemplate(deleteContactPhotosSqlQuery, contactId);
+    private int deleteContactPhoto(int photoId) throws SQLException {
+        final String deleteContactPhotosSqlQuery = "DELETE FROM photos WHERE id_photo = ?";
+        return deleteRowsByIdTemplate(deleteContactPhotosSqlQuery, photoId);
+    }
+
+    private int getContactPhotoId(int contactId) throws SQLException {
+        // first need to get photo id
+        int photoId;
+        final String getContactPhotoIdSqlQuery = "SELECT id_photo FROM contacts WHERE id_contact = ?";
+        PreparedStatement getContactPhotoIdStmt = null;
+        try {
+            getContactPhotoIdStmt = connection.prepareStatement(getContactPhotoIdSqlQuery);
+            getContactPhotoIdStmt.setInt(1, contactId);
+
+            ResultSet resultSet = getContactPhotoIdStmt.executeQuery();
+            if (resultSet.next()) {
+                photoId = resultSet.getInt(1);
+            } else {
+                throw new SQLException("Cannot find id_photo of contact with id_contact=" + contactId);
+            }
+        } finally {
+            closeStatement(getContactPhotoIdStmt);
+        }
+        return photoId;
     }
 
     private int deleteContactAttachments(int contactId) throws SQLException {
@@ -409,138 +448,162 @@ public class JdbcContactDao implements ContactDao {
         deleteRowsStmt.setInt(1, rowId);
 
         deletedRows = deleteRowsStmt.executeUpdate();
+        closeStatement(deleteRowsStmt);
         return deletedRows;
     }
 
-    private int getContactAddressId(int contactId) throws SQLException {
-        int addressId;
-        PreparedStatement getContactAddressIdStmt;
-
-        final String getContactAddressIdSqlQuery = "SELECT id_address FROM contacts WHERE id_contact = ?";
-
-        getContactAddressIdStmt = connection.prepareStatement(getContactAddressIdSqlQuery);
-        getContactAddressIdStmt.setInt(1, contactId);
-
-        ResultSet resultSet = getContactAddressIdStmt.executeQuery();
-        if(resultSet.next()){
-            addressId = resultSet.getInt(1);
-        } else {
-            throw new SQLException("Cannot find id_address according id_contact = " + contactId);
-        }
-        return addressId;
-    }
-
     @Override
-    public Contact getContact(final int contactId) {
-        Contact contact = null;
+    public Contact getContact(final int contactId) throws ContactDaoException {
+        Contact contact;
         try {
             contact = getContactInfo(contactId);
             contact.setAttachments(getContactAttachments(contactId));
             contact.setPhones(getContactPhones(contactId));
-            contact.setPhoto(getContactPhoto(contactId));
-        }catch (SQLException e){
-            AppLogger.error(e.getMessage());
-        }finally {
-            return contact;
-        }
-
-    }
-
-    private Contact getContactInfo (final int contactId) throws SQLException{
-        Contact contact = new Contact();
-        PreparedStatement getContactInfoStmt;
-
-        final String getContactInfoSqlQuery =
-                "SELECT  c.first_name, c.surname, c.patronymic,\n" +
-                        "c.birthday, c.website, c.email, a.country, a.city, a.address,\n" +
-                        "a.index_number, comp.company, g.gender, n.nationality, m.marital_status_name\n" +
-                        "FROM contacts AS c\n" +
-                        "INNER JOIN addresses AS a ON c.id_address = a.id_address\n" +
-                        "INNER JOIN companies AS comp ON c.id_company = comp.id_company\n" +
-                        "INNER JOIN genders AS g ON c.id_gender = g.id_gender\n" +
-                        "INNER JOIN nationalities AS n ON c.id_nationality = n.id_nationality\n" +
-                        "INNER JOIN marital_status AS m ON c.id_marital_status = m.id_marital_status\n" +
-                        "WHERE c.id_contact = ?";
-
-        getContactInfoStmt = connection.prepareStatement(getContactInfoSqlQuery);
-        getContactInfoStmt.setInt(1,contactId);
-
-        ResultSet resultSet = getContactInfoStmt.executeQuery();
-        if(resultSet.next()){
-            contact.setContactId(contactId);
-            contact.setFirstName(resultSet.getString(1));
-            contact.setSurname(resultSet.getString(2));
-            contact.setPatronymic(resultSet.getString(3));
-            contact.setBirthday(resultSet.getDate(4));
-            contact.setWebsite(resultSet.getString(5));
-            contact.setEmail(resultSet.getString(6));
-
-            Address address = new Address();
-            address.setCountry(resultSet.getString(7));
-            address.setCity(resultSet.getString(8));
-            address.setAddress(resultSet.getString(9));
-            address.setIndex(resultSet.getString(10));
-
-            contact.setAddress(address);
-
-            contact.setCompany(resultSet.getString(11));
-            contact.setGender(resultSet.getString(12));
-            contact.setNationality(resultSet.getString(13));
-            contact.setMaritalStatus(resultSet.getString(14));
-        } else {
-            throw new SQLException("No contact with such id_contact");
+        }catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
         }
         return contact;
     }
 
-    private List<Attachment> getContactAttachments (final int contactId) throws SQLException{
-        List<Attachment> attachments = new ArrayList<>();
-        PreparedStatement getContactAttachmentsStmt;
+    private Contact getContactInfo (final int contactId) throws SQLException{
+        Contact contact = new Contact();
+        PreparedStatement getContactInfoStmt = null;
 
-        final String getContactAttachmentsSqlQuery =
-                "SELECT a.id_attachment, a.name, a.download_date, a.commentary, a.attachment\n" +
-                "FROM attachments AS a WHERE id_contact = ?";
+        try {
+            final String getContactInfoSqlQuery =
+                    "SELECT first_name, surname, patronymic, birthday, website, \n" +
+                    "email, country, city, address, index_number, gender, marital_status \n" +
+                    "FROM contacts \n" +
+                    "WHERE id_contact = ? \n";
 
-        getContactAttachmentsStmt = connection.prepareStatement(getContactAttachmentsSqlQuery);
-        getContactAttachmentsStmt.setInt(1, contactId);
+            getContactInfoStmt = connection.prepareStatement(getContactInfoSqlQuery);
+            getContactInfoStmt.setInt(1, contactId);
 
-        ResultSet resultSet = getContactAttachmentsStmt.executeQuery();
-        while(resultSet.next()){
-            Attachment attachment = new Attachment();
-            attachment.setAttachmentId(resultSet.getInt(1));
-            attachment.setFileName(resultSet.getString(2));
-            attachment.setDownloadDate(resultSet.getDate(3));
-            attachment.setComment(resultSet.getString(4));
-            attachment.setFileStream(resultSet.getBinaryStream(5));
-
-            attachments.add(attachment);
+            ResultSet resultSet = getContactInfoStmt.executeQuery();
+            if (resultSet.next()) {
+                contact.setContactId(contactId);
+                contact.setFirstName(resultSet.getString(1));
+                contact.setSurname(resultSet.getString(2));
+                contact.setPatronymic(resultSet.getString(3));
+                contact.setBirthday(resultSet.getDate(4).toString());
+                contact.setWebsite(resultSet.getString(5));
+                contact.setEmail(resultSet.getString(6));
+                contact.setCountry(resultSet.getString(7));
+                contact.setCity(resultSet.getString(8));
+                contact.setAddress(resultSet.getString(9));
+                contact.setIndexNumber(resultSet.getString(10));
+                contact.setGender(resultSet.getString(11));
+                contact.setMaritalStatus(resultSet.getString(12));
+            } else {
+                throw new SQLException("No contact with such id_contact");
+            }
+        } finally {
+            closeStatement(getContactInfoStmt);
         }
 
+        // get fields of contact from other tables
+        String company = getContactCompany(contactId);
+        contact.setCompany(company);
+        String nationality = getContactNationality(contactId);
+        contact.setNationality(nationality);
+        Photo photo = getContactPhoto(contactId);
+        contact.setPhoto(photo);
+
+        return contact;
+    }
+
+    private String getContactCompany(int contactId) throws SQLException{
+        final String getContactCompanySqlQuery =
+                "SELECT comp.company \n" +
+                "FROM companies comp \n" +
+                "INNER JOIN contacts c ON c.id_contact = ? AND comp.id_company = c.id_company";
+
+        return getContactAttributeUsingForeignKey(getContactCompanySqlQuery, contactId);
+    }
+
+    private String getContactNationality(int contactId) throws SQLException{
+        final String getContactNationalitySqlQuery =
+                "SELECT n.nationality \n" +
+                "FROM nationalities n \n" +
+                "INNER JOIN contacts c ON c.id_contact = ? AND n.id_nationality = c.id_nationality";
+
+        return getContactAttributeUsingForeignKey(getContactNationalitySqlQuery, contactId);
+    }
+
+    private String getContactAttributeUsingForeignKey(String sqlQuery, int contactId) throws SQLException{
+        String attribute;
+        PreparedStatement getContactAttributeStmt = null;
+        try {
+            getContactAttributeStmt = connection.prepareStatement(sqlQuery);
+            getContactAttributeStmt.setInt(1, contactId);
+
+            ResultSet resultSet = getContactAttributeStmt.executeQuery();
+            if (resultSet.next()) {
+                attribute = resultSet.getString(1);
+            } else {
+                throw new SQLException("Cannot get contact attribute using foreign key with id_contact=" + contactId);
+            }
+        } finally {
+            closeStatement(getContactAttributeStmt);
+        }
+        return attribute;
+    }
+
+    private List<Attachment> getContactAttachments (final int contactId) throws SQLException{
+        List<Attachment> attachments = new ArrayList<>();
+        PreparedStatement getContactAttachmentsStmt = null;
+
+        try {
+            final String getContactAttachmentsSqlQuery =
+                    "SELECT id_attachment, name, download_date, commentary, attachment\n" +
+                    "FROM attachments WHERE id_contact = ?";
+
+            getContactAttachmentsStmt = connection.prepareStatement(getContactAttachmentsSqlQuery);
+            getContactAttachmentsStmt.setInt(1, contactId);
+
+            ResultSet resultSet = getContactAttachmentsStmt.executeQuery();
+            while (resultSet.next()) {
+                Attachment attachment = new Attachment();
+                attachment.setAttachmentId(resultSet.getInt(1));
+                attachment.setFileName(resultSet.getString(2));
+                attachment.setDownloadDate(resultSet.getDate(3).toString());
+                attachment.setComment(resultSet.getString(4));
+                attachment.setFileStream(resultSet.getBinaryStream(5));
+
+                attachments.add(attachment);
+            }
+        }finally {
+            closeStatement(getContactAttachmentsStmt);
+        }
         return attachments;
     }
 
     private List<Phone> getContactPhones (final int contactId) throws SQLException{
         List<Phone> phones = new ArrayList<>();
-        PreparedStatement getContactPhonesStmt;
+        PreparedStatement getContactPhonesStmt = null;
 
-        final String getContactPhonesSqlQuery =
-                "SELECT p.id_phone, p.phone_number, p.commentary, pt.phone_type\n" +
-                "FROM phones AS p\n" +
-                "INNER JOIN phone_types AS pt ON p.id_phone_type = pt.id_phone_type\n" +
-                "WHERE p.id_contact = ?";
+        try {
+            final String getContactPhonesSqlQuery =
+                    "SELECT id_phone, phone_number, commentary, phone_type \n" +
+                    "FROM phones \n" +
+                    "WHERE id_contact = ?";
 
-        getContactPhonesStmt = connection.prepareStatement(getContactPhonesSqlQuery);
-        getContactPhonesStmt.setInt(1, contactId);
+            getContactPhonesStmt = connection.prepareStatement(getContactPhonesSqlQuery);
+            getContactPhonesStmt.setInt(1, contactId);
 
-        ResultSet resultSet = getContactPhonesStmt.executeQuery();
-        while(resultSet.next()){
-            Phone phone = new Phone();
-            phone.setPhoneId(resultSet.getInt(1));
-            phone.setPhoneNumber(resultSet.getString(2));
-            phone.setComment(resultSet.getString(3));
-            phone.setPhoneType(resultSet.getString(4));
+            ResultSet resultSet = getContactPhonesStmt.executeQuery();
+            while (resultSet.next()) {
+                Phone phone = new Phone();
+                phone.setPhoneId(resultSet.getInt(1));
+                phone.setPhoneNumber(resultSet.getString(2));
+                phone.setComment(resultSet.getString(3));
+                phone.setPhoneType(resultSet.getString(4));
 
-            phones.add(phone);
+                phones.add(phone);
+            }
+        } finally {
+            closeStatement(getContactPhonesStmt);
         }
 
         return phones;
@@ -548,38 +611,40 @@ public class JdbcContactDao implements ContactDao {
 
     private Photo getContactPhoto (final int contactId) throws SQLException{
         Photo photo;
-        PreparedStatement getContactPhotoStmt;
+        PreparedStatement getContactPhotoStmt = null;
+        try {
+            final String getContactPhotoSqlQuery =
+                    "SELECT p.id_photo, p.photo \n" +
+                    "FROM photos p \n" +
+                    "INNER JOIN contacts c ON c.id_photo = p.id_photo AND c.id_contact = ?";
 
-        final String getContactPhotoSqlQuery =
-                "SELECT p.id_photo, p.photo FROM photos AS p \n" +
-                "WHERE p.id_contact = ?";
+            getContactPhotoStmt = connection.prepareStatement(getContactPhotoSqlQuery);
+            getContactPhotoStmt.setInt(1, contactId);
 
-        getContactPhotoStmt = connection.prepareStatement(getContactPhotoSqlQuery);
-        getContactPhotoStmt.setInt(1, contactId);
-
-        ResultSet resultSet = getContactPhotoStmt.executeQuery();
-        if(resultSet.next()){
-            photo = new Photo();
-            photo.setPhotoId(resultSet.getInt(1));
-            photo.setPhotoStream(resultSet.getBinaryStream(2));
-        } else {
-            photo = Photo.EMPTY_PHOTO;
+            ResultSet resultSet = getContactPhotoStmt.executeQuery();
+            if (resultSet.next()) {
+                photo = new Photo();
+                photo.setPhotoId(resultSet.getInt(1));
+                photo.setPhotoStream(resultSet.getBinaryStream(2));
+            } else {
+                throw new SQLException("Cannot find row in photos table associated with contact who's id_contact=" + contactId);
+            }
+        } finally {
+            closeStatement(getContactPhotoStmt);
         }
         return photo;
     }
 
     @Override
-    public List<Contact> getContacts(final int recordOffset, final int recordCount) {
-        List<Contact> contacts = null;
-        PreparedStatement getContactsStmt;
+    public List<Contact> getContacts(final int recordOffset, final int recordCount) throws ContactDaoException {
+        List<Contact> contacts;
+        PreparedStatement getContactsStmt = null;
         final String getContactsSqlQuery =
-                "SELECT SQL_CALC_FOUND_ROWS c.id_contact, c.first_name, c.surname, c.patronymic, com.company, \n"
-                        + "c.birthday, c.website, a.country, a.city, a.address, a.index_number \n"
-                        + "FROM contacts AS c \n"
-                        + "INNER JOIN addresses AS a ON c.id_address = a.id_address \n"
-                        + "INNER JOIN companies AS com ON c.id_company = com.id_company \n"
-                        + "LIMIT ?, ?";
-
+                "SELECT c.id_contact, c.first_name, c.surname, c.patronymic, \n" +
+                "c.country, c.city, c.address, c.index_number, comp.company, c.birthday \n" +
+                "FROM contacts c \n" +
+                "INNER JOIN companies comp ON c.id_company = comp.id_company \n" +
+                "LIMIT ?, ?";
         try {
             getContactsStmt = connection.prepareStatement(getContactsSqlQuery);
             getContactsStmt.setInt(1, recordOffset);
@@ -587,49 +652,68 @@ public class JdbcContactDao implements ContactDao {
 
             ResultSet resultSet = getContactsStmt.executeQuery();
             contacts = new ArrayList<>(recordCount);
-
             while(resultSet.next()){
                 Contact c = new Contact();
                 c.setContactId(resultSet.getInt(1));
                 c.setFirstName(resultSet.getString(2));
                 c.setSurname(resultSet.getString(3));
                 c.setPatronymic(resultSet.getString(4));
-                c.setCompany(resultSet.getString(5));
-                c.setBirthday(resultSet.getDate(6));
-                c.setWebsite((resultSet.getString(7)));
+                c.setCountry(resultSet.getString(5));
+                c.setCity(resultSet.getString(6));
+                c.setAddress(resultSet.getString(7));
+                c.setIndexNumber(resultSet.getString(8));
+                c.setCompany(resultSet.getString(9));
+                c.setBirthday(resultSet.getString(10));
 
-                Address a = new Address();
-                a.setCountry(resultSet.getString(8));
-                a.setCity(resultSet.getString(9));
-                a.setAddress(resultSet.getString(10));
-                a.setIndex(resultSet.getString(11));
-
-                c.setAddress(a);
                 contacts.add(c);
             }
-        } catch (SQLException e){
-            AppLogger.error(e.getMessage());
-        } finally {
-            return contacts;
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            closeStatement(getContactsStmt);
+            throw new ContactDaoException(sqle);
         }
+        return contacts;
     }
 
     @Override
-    public int addAttachmentToContact(final int contactId, final Attachment attachment) {
-        int generatedAttachmentId = 0;
+    public int getContactCount() throws ContactDaoException{
+        int contactCount = 0;
+        PreparedStatement getContactCountStmt = null;
+
+        final String getContactCountSqlQuery = "SELECT COUNT(id_contact) AS contact_count FROM contacts";
+
+        try{
+            getContactCountStmt = connection.prepareStatement(getContactCountSqlQuery);
+            ResultSet resultSet = getContactCountStmt.executeQuery(getContactCountSqlQuery);
+
+            if(resultSet.next()){
+                contactCount = resultSet.getInt(1);
+            }
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            closeStatement(getContactCountStmt);
+            throw new ContactDaoException(sqle);
+        }
+        return contactCount;
+    }
+
+    @Override
+    public int addAttachmentToContact(final int contactId, final Attachment attachment) throws ContactDaoException {
+        int generatedAttachmentId;
+
+        PreparedStatement addAttachmentStmt = null;
         try {
-            connection.setAutoCommit(false);
-
             final String addAttachmentSqlQuery =
-                    "INSERT INTO attachments(id_contact, name, \n" +
+                    "INSERT INTO attachments (id_contact, name, \n" +
                     "download_date, commentary, attachment) VALUES \n" +
-                    "(?, ?, ?, ?, ?)";
+                    "(?, ?, ?, ?, ?) ";
 
-            PreparedStatement addAttachmentStmt = connection.prepareStatement(addAttachmentSqlQuery,
+            addAttachmentStmt = connection.prepareStatement(addAttachmentSqlQuery,
                     Statement.RETURN_GENERATED_KEYS);
+
             addAttachmentStmt.setInt(1, contactId);
             addAttachmentStmt.setString(2, attachment.getFileName());
-            addAttachmentStmt.setDate(3,  new java.sql.Date(attachment.getDownloadDate().getTime()));
+            addAttachmentStmt.setDate(3,  java.sql.Date.valueOf(attachment.getDownloadDate()));
             addAttachmentStmt.setString(4, attachment.getComment());
             addAttachmentStmt.setBinaryStream(5, attachment.getFileStream(), attachment.getFileSize());
 
@@ -645,44 +729,135 @@ public class JdbcContactDao implements ContactDao {
             else {
                 throw new SQLException("Creating of new attachment is failed, no ID obtained ");
             }
-            connection.commit();
-        } catch (SQLException e){
-            AppLogger.error(e.getMessage());
-            if(connection != null){
-                try{
-                    connection.rollback();
-                } catch (SQLException ex){
-                    AppLogger.error(ex.getMessage());
-                }
-            }
-        } finally {
-            return generatedAttachmentId;
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            closeStatement(addAttachmentStmt);
+            throw new ContactDaoException(sqle);
         }
+        return generatedAttachmentId;
     }
 
     @Override
-    public int updateAttachmentFromContact(final int attachmentId, final Attachment attachment) {
-        return 0;
+    public int updateAttachmentFromContact(final int attachmentId, final Attachment attachment)
+            throws ContactDaoException {
+        int rowsUpdated;
+        PreparedStatement updateAttachmentFromContactStmt = null;
+
+        final String updateAttachmentFromContactSqlQuery =
+                "UPDATE attachments \n" +
+                "SET name = ?, download_date = ?, commentary = ?, attachment = ? \n" +
+                "WHERE id_attachment = ?";
+        try {
+            updateAttachmentFromContactStmt = connection.prepareStatement(updateAttachmentFromContactSqlQuery);
+
+            updateAttachmentFromContactStmt.setString(1, attachment.getFileName());
+            updateAttachmentFromContactStmt.setDate(2,
+                    java.sql.Date.valueOf(attachment.getDownloadDate()));
+            updateAttachmentFromContactStmt.setString(3, attachment.getComment());
+            updateAttachmentFromContactStmt.setBinaryStream(4,
+                    attachment.getFileStream(), attachment.getFileSize());
+            updateAttachmentFromContactStmt.setInt(5, attachmentId);
+
+            rowsUpdated = updateAttachmentFromContactStmt.executeUpdate();
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
+        } finally {
+            closeStatement(updateAttachmentFromContactStmt);
+        }
+        return rowsUpdated;
     }
 
     @Override
-    public int deleteAttachmentFromContact(final int attachmentId) {
-        return 0;
+    public int deleteAttachmentFromContact(final int attachmentId) throws ContactDaoException {
+        int rowsDeleted;
+        final String deleteAttachmentSqlQuery = "DELETE FROM attachments WHERE id_attachment = ?";
+        try {
+            rowsDeleted = deleteRowsByIdTemplate(deleteAttachmentSqlQuery, attachmentId);
+        }catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
+        }
+        return rowsDeleted;
     }
 
     @Override
-    public int addPhoneToContact(final int contactId, final Phone phone) {
-        return 0;
+    public int addPhoneToContact(final int contactId, final Phone phone) throws ContactDaoException {
+        int generatedPhoneId;
+
+        PreparedStatement addPhoneStmt = null;
+        try {
+            final String addPhoneSqlQuery =
+                    "INSERT INTO phones(id_contact, phone_number, \n" +
+                    "phone_type, commentary) VALUES \n" +
+                    "(?, ?, ?, ?) ";
+
+            addPhoneStmt = connection.prepareStatement(addPhoneSqlQuery,
+                    Statement.RETURN_GENERATED_KEYS);
+
+            addPhoneStmt.setInt(1, contactId);
+            addPhoneStmt.setString(2, phone.getPhoneNumber());
+            addPhoneStmt.setString(3, phone.getPhoneType() );
+            addPhoneStmt.setString(4, phone.getComment());
+
+            int affectedRows = addPhoneStmt.executeUpdate();
+            if(affectedRows == 0){
+                throw new SQLException("Creating of new phone is failed, no rows affected");
+            }
+
+            ResultSet generatedKeys = addPhoneStmt.getGeneratedKeys();
+            if(generatedKeys.next()){
+                generatedPhoneId = generatedKeys.getInt(1);
+            }
+            else {
+                throw new SQLException("Creating of new phone is failed, no ID obtained ");
+            }
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            closeStatement(addPhoneStmt);
+            throw new ContactDaoException(sqle);
+        }
+        return generatedPhoneId;
     }
 
     @Override
-    public int updatePhoneFromContact(final int phoneId, Phone phone) {
-        return 0;
+    public int updatePhoneFromContact(final int phoneId, Phone phone) throws ContactDaoException {
+        int rowsUpdated;
+        PreparedStatement updatePhoneStmt = null;
+
+        final String updatePhoneSqlQuery =
+                "UPDATE phones \n" +
+                "SET phone_number = ?, phone_type = ?, commentary = ? \n" +
+                "WHERE id_phone = ?";
+        try {
+            updatePhoneStmt = connection.prepareStatement(updatePhoneSqlQuery);
+
+            updatePhoneStmt.setString(1, phone.getPhoneNumber());
+            updatePhoneStmt.setString(2, phone.getPhoneType());
+            updatePhoneStmt.setString(3, phone.getComment());
+            updatePhoneStmt.setInt(4, phoneId);
+
+            rowsUpdated = updatePhoneStmt.executeUpdate();
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
+        } finally {
+            closeStatement(updatePhoneStmt);
+        }
+        return rowsUpdated;
     }
 
     @Override
-    public int deletePhoneFromContact(final int phoneId) {
-        return 0;
+    public int deletePhoneFromContact(final int phoneId) throws ContactDaoException{
+        int rowsDeleted;
+        final String deletePhoneSqlQuery = "DELETE FROM phones WHERE id_phone = ?";
+        try {
+            rowsDeleted = deleteRowsByIdTemplate(deletePhoneSqlQuery, phoneId);
+        }catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
+        }
+        return rowsDeleted;
     }
 
     /**
@@ -700,23 +875,49 @@ public class JdbcContactDao implements ContactDao {
         }
     }
 
-    public int getContactCount(){
-        int contactCount = 0;
-        PreparedStatement getContactCountStmt;
-
-        final String getContactCountSqlQuery = "SELECT COUNT(id_contact) AS contact_count FROM contacts";
-
+    @Override
+    public void closeDao(boolean wasDaoActionsSuccessful) throws ContactDaoException {
         try{
-            getContactCountStmt = connection.prepareStatement(getContactCountSqlQuery);
-            ResultSet resultSet = getContactCountStmt.executeQuery(getContactCountSqlQuery);
-
-            if(resultSet.next()){
-                contactCount = resultSet.getInt(1);
+            if(wasDaoActionsSuccessful){
+                if(connection != null) {
+                    connection.commit();
+                }
+            } else {
+                if(connection != null){
+                    connection.rollback(initialSavePoint);
+                }
             }
-        } catch (SQLException e){
-            AppLogger.error(e.getMessage());
-        } finally {
-            return contactCount;
+            closeConnection();
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            closeConnection(connection);
+            throw new ContactDaoException(sqle);
+        }
+    }
+
+    @Override
+    public void closeDao() throws ContactDaoException {
+        closeConnection();
+    }
+
+    private void closeConnection(Connection connection) throws ContactDaoException{
+        if(connection != null){
+            try{
+                connection.close();
+            } catch (SQLException sqlex){
+                AppLogger.error(sqlex.getMessage());
+                throw new ContactDaoException(sqlex);
+            }
+        }
+    }
+
+    private void closeStatement(Statement statement) {
+        try {
+            if (statement != null) {
+                statement.close();
+            }
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
         }
     }
 }

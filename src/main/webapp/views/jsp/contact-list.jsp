@@ -64,7 +64,7 @@
                         <c:out value="${contact.firstName} ${contact.patronymic} ${contact.surname}"/>
                     </a></td>
                     <td><c:out value="${contact.birthday}"/></td>
-                    <td><c:out value="${contact.address.country}, ${contact.address.city}, ${contact.address.address}, ${contact.address.index}"/></td>
+                    <td><c:out value="${contact.country}, ${contact.city}, ${contact.address}, ${contact.indexNumber}"/></td>
                     <td><c:out value="${contact.company}"/></td>
                     <td class="col-xs-2">
                         <div class="btn-group">

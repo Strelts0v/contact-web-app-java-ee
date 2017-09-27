@@ -3,6 +3,7 @@ package com.itechart.app.model.dao;
 import com.itechart.app.model.entities.Attachment;
 import com.itechart.app.model.entities.Contact;
 import com.itechart.app.model.entities.Phone;
+import com.itechart.app.model.exceptions.ContactDaoException;
 
 import java.util.List;
 
@@ -12,85 +13,122 @@ import java.util.List;
 public interface ContactDao {
 
     /**
+     * perform actions to initialize dao object
+     * @throws ContactDaoException - if there is error during performing method
+     */
+    void initializeDao() throws ContactDaoException;
+
+    /**
      * creates new contact in database
      * @param contact - object with all necessary properties
-     * @return - created Contact object in database
+     * @return - created Contact object in storage
+     * @throws ContactDaoException - if there is error during performing method
      */
-    Contact createContact(final Contact contact);
+    Contact createContact(final Contact contact) throws ContactDaoException;
 
     /**
-     * updates existed contact in database
+     * updates existed contact in storage
      * @param contactId - unique property used to find updated contact
      * @param contact - object with new properties
-     * @return - count of updated records in database
+     * @return - count of updated records in storage
+     * @throws ContactDaoException - if there is error during performing method
      */
-    int updateContact(final int contactId, final Contact contact);
+    int updateContact(final int contactId, final Contact contact) throws ContactDaoException;
 
     /**
-     * deletes existed contact from database
+     * deletes existed contact from storage
      * @param contactId - unique property used to find deleted contact
-     * @return - count of deleted records in database
+     * @return - count of deleted records in storage
+     * @throws ContactDaoException - if there is error during performing method
      */
-    int deleteContact(final int contactId);
+    int deleteContact(final int contactId) throws ContactDaoException;
 
     /**
-     * gets existed contact from database
+     * gets existed contact from storage
      * @param contactId - unique property used to find contact
-     * @return - Contact object whis is hold all contact properties
+     * @return - Contact object who's is hold all contact properties
+     * @throws ContactDaoException - if there is error during performing method
      */
-    Contact getContact(final int contactId);
+    Contact getContact(final int contactId) throws ContactDaoException;
 
     /**
-     * gets Contact objects from database
-     * @param recordOffset - offset of all contact stored in database
+     * gets Contact objects from storage
+     * @param recordOffset - offset of all contact stored in storage
      * @param recordCount - count of contacts to return
      * @return list of Contact objects
+     * @throws ContactDaoException - if there is error during performing method
      */
-    List<Contact> getContacts(final int recordOffset, final int recordCount);
+    List<Contact> getContacts(final int recordOffset, final int recordCount) throws ContactDaoException;
+
+    /**
+     * gets count of contacts in storage
+     * @return count of contact objects in storage
+     * @throws ContactDaoException - if there is error during performing method
+     */
+    int getContactCount() throws ContactDaoException;
 
     /**
      * adds attachment to contact
      * @param contactId - unique property of contact object
      * @param attachment - object that store attachment properties
-     * @return count of created records in database
+     * @return id of created attachment in storage
+     * @throws ContactDaoException - if there is error during performing method
      */
-    int addAttachmentToContact(final int contactId, final Attachment attachment);
+    int addAttachmentToContact(final int contactId, final Attachment attachment) throws ContactDaoException;
 
     /**
-     * updates existed attachment in database
+     * updates existed attachment in storage
      * @param attachmentId - unique property used to find updated attachment
      * @param attachment - object with new attachment properties
-     * @return - count of updated records in database
+     * @return - count of updated records in storage
+     * @throws ContactDaoException - if there is error during performing method
      */
-    int updateAttachmentFromContact(final int attachmentId, final Attachment attachment);
+    int updateAttachmentFromContact(final int attachmentId, final Attachment attachment) throws ContactDaoException;
 
     /**
-     * deletes existed attachment from database
+     * deletes existed attachment from storage
      * @param attachmentId - unique property used to find deleted attachment
-     * @return - count of deleted records in database
+     * @return - count of deleted records in storage
+     * @throws ContactDaoException - if there is error during performing method
      */
-    int deleteAttachmentFromContact(final int attachmentId);
+    int deleteAttachmentFromContact(final int attachmentId) throws ContactDaoException;
 
     /**
      * adds phone to contact
      * @param contactId - unique property of contact object
      * @param phone - object that store phone properties
-     * @return count of created records in database
+     * @return count of created records in storage
+     * @throws ContactDaoException - if there is error during performing method
      */
-    int addPhoneToContact(final int contactId, final Phone phone);
+    int addPhoneToContact(final int contactId, final Phone phone) throws ContactDaoException;
 
     /**
-     * updates existed phone in database
+     * updates existed phone in storage
      * @param phoneId - unique property used to find updated phone
      * @param phone - object with new phone properties
-     * @return - count of updated records in database
+     * @return - count of updated records in storage
+     * @throws ContactDaoException - if there is error during performing method
      */
-    int updatePhoneFromContact(final int phoneId, final Phone phone);
+    int updatePhoneFromContact(final int phoneId, final Phone phone) throws ContactDaoException;
 
     /**
-     * deletes existed phone from database
+     * deletes existed phone from storage
      * @param phoneId - unique property used to find deleted phone
-     * @return - count of deleted records in database
+     * @return - count of deleted records in storage
+     * @throws ContactDaoException - if there is error during performing method
      */
-    int deletePhoneFromContact(final int phoneId);
+    int deletePhoneFromContact(final int phoneId) throws ContactDaoException;
+
+    /**
+     * perform actions to close dao object
+     * @param wasDaoActionsSuccessful - indicated was any mistake in dao actions
+     * @throws ContactDaoException - if there is error during performing method
+     */
+    void closeDao(boolean wasDaoActionsSuccessful) throws ContactDaoException;
+
+    /**
+     * perform actions to close dao object
+     * @throws ContactDaoException - if there is error during performing method
+     */
+    void closeDao() throws ContactDaoException;
 }

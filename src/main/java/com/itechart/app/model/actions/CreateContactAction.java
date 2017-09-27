@@ -4,6 +4,7 @@ import com.itechart.app.controller.utils.RequestContent;
 import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.dao.JdbcContactDao;
 import com.itechart.app.model.entities.Contact;
+import com.itechart.app.model.exceptions.ContactDaoException;
 import com.itechart.app.model.utils.ContactMapper;
 import com.itechart.app.model.utils.PageConfigurationManager;
 
@@ -40,8 +41,11 @@ public class CreateContactAction implements ContactAction{
                     page = PageConfigurationManager.getPageName(CONTACT_DETAIL_PAGE_NAME);
                     dao.closeConnection();
                 }
-            } catch (ParseException e) {
-                AppLogger.error(e.getMessage());
+            } catch (ParseException pe) {
+                AppLogger.error(pe.getMessage());
+                page = PageConfigurationManager.getPageName(ERROR_PAGE_NAME);
+            } catch (ContactDaoException cde){
+                AppLogger.error(cde.getMessage());
                 page = PageConfigurationManager.getPageName(ERROR_PAGE_NAME);
             }
         }

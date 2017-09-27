@@ -22,6 +22,10 @@ const INDEX_INPUT_ID = "index";
 // param names for sending request to server
 const PHONES_PARAM_NAME = "phones";
 const ATTACHMENTS_PARAM_NAME = "attachments";
+const PHOTO_PARAM_NAME = "photo";
+
+// storage for sending data to the server
+var formData = new FormData();
 
 // css class names
 const PHONE_CLASS_NAME = "phoneItem";
@@ -44,34 +48,6 @@ function updateContact(){
     const address = document.getElementById(ADDRESS_INPUT_ID).value;
     const index = document.getElementById(INDEX_INPUT_ID).value;
 
-    var phoneTableRows = document.getElementsByClassName(PHONE_CLASS_NAME);
-    var phones = [];
-    for(var i = 0; i < phoneTableRows.length; i++){
-        phones[i] = parsePhone(phoneTableRows[i].innerText, phoneTableRows[i].cells[0].innerHTML)
-    }
-
-    // get all attachments
-    var attachmentTableBody = document.getElementById(ATTACHMENT_TABLE_BODY_ID);
-    var attachmentTableRows = attachmentTableBody.childNodes;
-    var attachments = [];
-    for(var i = 0; i < attachmentTableRows.length; i++){
-        attachments[i] = [];
-        var tdItems = attachmentTableRows.childNodes;
-        if(!tdItems){
-            continue;
-        }
-        for(var j = 0; j < tdItems.length; j++){
-            attachments[i][j] = tdItems[j].innerHTML;
-        }
-    }
-
-    // var filesXhr = new XMLHttpRequest();
-    // filesXhr.open("post", "/upload/add_attachment_to_contact");
-    // filesXhr.send(formData);
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("post", "/upload/add_attachment_to_contact");
-
     formData.append(ID_CONTACT_INPUT_ID, contactId);
     formData.append(SURNAME_INPUT_ID, surname);
     formData.append(FIRSTNAME_INPUT_ID, firstName);
@@ -88,35 +64,36 @@ function updateContact(){
     formData.append(ADDRESS_INPUT_ID, address);
     formData.append(INDEX_INPUT_ID, index);
 
-    // TODO: append files from attachments
-
+    var phoneTableRows = document.getElementsByClassName(PHONE_CLASS_NAME);
+    var phones = [];
+    for(var i = 0; i < phoneTableRows.length; i++){
+        phones[i] = parsePhone(phoneTableRows[i].innerText, phoneTableRows[i].cells[0].innerHTML)
+    }
     var phonesJson = JSON.stringify(phones);
-    formData.append(PHONES_PARAM_NAME,phonesJson);
+    formData.append(PHONES_PARAM_NAME, phonesJson);
+
+    // get all attachments properties
+    var attachmentTableBody = document.getElementById(ATTACHMENT_TABLE_BODY_ID);
+    var attachmentTableRows = attachmentTableBody.children;
+    var attachments = [];
+    for(var i = 0; i < attachmentTableRows.length; i++){
+        attachments[i] = parseAttachment(attachmentTableRows[i]);
+    }
+    var attachmentsJson = JSON.stringify(attachments);
+    formData.append(ATTACHMENTS_PARAM_NAME, attachmentsJson);
+
+    // add new attachments to formData for sending to the server
+    for(var attachmentName in attachmentFileStorage){
+        formData.append(attachmentName, attachmentFileStorage[attachmentName]);
+    }
+
+    // add current contact photo to formData for sending to the server
+    formData.append(PHOTO_PARAM_NAME, currentPhoto);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("post", "/upload/add_attachment_to_contact");
 
     xhr.send(formData);
-
-    // xhr.open("post", "/upload/add_attachment_to_contact");
-//    xhr.send(
-//        ID_CONTACT_INPUT_ID + "=" + contactId + "&" +
-//        SURNAME_INPUT_ID + "=" + surname + "&" +
-//        FIRSTNAME_INPUT_ID + "=" + firstName + "&" +
-//        PATRONYMIC_INPUT_ID + "=" + patronymic + "&" +
-//        BIRTHDAY_INPUT_ID + "=" + birthday + "&" +
-//        GENDER_INPUT_ID + "=" + gender + "&" +
-//        NATIONALITY_INPUT_ID + "=" + nationality + "&" +
-//        MARITAL_STATUS_INPUT_ID + "=" + marital_status + "&" +
-//        WEBSITE_INPUT_ID + "=" + website + "&" +
-//        EMAIL_INPUT_ID + "=" + email + "&" +
-//        COMPANY_INPUT_ID + "=" + company + "&" +
-//        COUNTRY_INPUT_ID + "=" + country + "&" +
-//        CITY_INPUT_ID + "=" + city + "&" +
-//        ADDRESS_INPUT_ID + "=" + address + "&" +
-//        INDEX_INPUT_ID + "=" + index
-//    );
-
-    // var filesXhr = new XMLHttpRequest();
-    // filesXhr.open("post", "/upload/add_attachment_to_contact");
-    // filesXhr.send(formData);
 }
 
 function parsePhone(innerText, innerTextWithPhoneId){
@@ -149,6 +126,31 @@ function parsePhoneId(innerTextWithPhoneId){
 function parseStringIntoWords(str){
     var words = str.match(/\b(\w+)\b/g);
     return words;
+}
+
+const ATTACHMENT_JSON_ID_PROPERTY = "attachmentId";
+const ATTACHMENT_JSON_FILENAME_PROPERTY = "fileName";
+const ATTACHMENT_JSON_DOWNLOAD_DATE_PROPERTY = "downloadDate";
+const ATTACHMENT_JSON_COMMENT_PROPERTY = "comment";
+
+function parseAttachment(attachmentTr){
+    var attachment = {};
+
+    const attachmentInputIndex = 0;
+    attachment[ATTACHMENT_JSON_ID_PROPERTY] =
+        attachmentTr.children[ATTACHMENT_ID_TD_INDEX]
+            .children[attachmentInputIndex].value;
+
+    attachment[ATTACHMENT_JSON_FILENAME_PROPERTY] =
+        attachmentTr.children[ATTACHMENT_NAME_TD_INDEX].innerHTML;
+
+    attachment[ATTACHMENT_JSON_DOWNLOAD_DATE_PROPERTY] =
+        attachmentTr.children[ATTACHMENT_DOWNLOAD_DATE_TD_INDEX].innerHTML;
+
+    attachment[ATTACHMENT_JSON_COMMENT_PROPERTY] =
+        attachmentTr.children[ATTACHMENT_COMMENT_TD_INDEX].innerHTML;
+
+    return attachment;
 }
 
 function setCheckboxesChecked(controlCheckBoxId, checkBoxName){
@@ -193,11 +195,8 @@ const MODAL_ATTACHMENT_NAME_ID = "attachment-name";
 const MODAL_ATTACHMENT_COMMENT_ID = "attachment-comment";
 const MODAL_ATTACHMENT_FILE_ID = "upload-attachment";
 
-// attachments storage for sending data to the server
-var formData = new FormData();
-
 // attachments storage for preliminary storing file before sending
-var attachments = {};
+var attachmentFileStorage = {};
 
 // table body id from table with attachments
 const ATTACHMENT_TABLE_BODY_ID = "attachment-table-body";
@@ -254,10 +253,11 @@ function addAttachment(){
     var attachmentName = document.getElementById(MODAL_ATTACHMENT_NAME_ID).value;
     var comment = document.getElementById(MODAL_ATTACHMENT_COMMENT_ID).value;
     var uploadFileInput = document.getElementById(MODAL_ATTACHMENT_FILE_ID);
-    var downloadDate = new Date();
+    var date = new Date();
+    var downloadDate = getDateInValidFormat(date);
 
     if(uploadFileInput.value){
-        attachments[attachmentName] = uploadFileInput.files[0];
+        attachmentFileStorage[attachmentName] = uploadFileInput.files[0];
     }
 
     var attachmentTableBody = document.getElementById(ATTACHMENT_TABLE_BODY_ID);
@@ -266,6 +266,10 @@ function addAttachment(){
     attachmentTableBody.appendChild(tr);
 
     cancelAttachment();
+}
+
+function getDateInValidFormat(date){
+    return date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
 }
 
 function createAttachmentTr(attachmentName, downloadDate, attachmentComment){
@@ -306,7 +310,7 @@ function createAttachmentFileNameTd(attachmentName){
 
 function createAttachmentDownloadDateTd(downloadDate){
     var downloadDateTd = document.createElement("td");
-    downloadDateTd.innerHTML = downloadDate.toDateString();
+    downloadDateTd.innerHTML = downloadDate;
 
     return downloadDateTd;
 }
@@ -326,7 +330,7 @@ function createAttachmentControlTd(){
     btnGroupDiv.className = "btn-group";
 
     var deleteButton = document.createElement("button");
-    deleteButton.className = "btn btn-sm btn-danger";
+    deleteButton.className = "btn btn-xs btn-danger";
     deleteButton.onclick = function(){deleteAttachment(this)};
 
     var deleteIcon = document.createElement("i");
@@ -334,15 +338,24 @@ function createAttachmentControlTd(){
     deleteButton.appendChild(deleteIcon);
 
     var editButton = document.createElement("button");
-    editButton.className = "btn btn-sm btn-warning";
+    editButton.className = "btn btn-xs btn-warning";
     editButton.onclick = function(){showAttachmentModal(editAttachment, editButton)};
 
     var editIcon = document.createElement("i");
     editIcon.className = "fa fa-pencil fa-lg";
     editButton.appendChild(editIcon);
 
+    var downloadButton = document.createElement("button");
+    downloadButton.className = "btn-btn-xs btn-info";
+    downloadButton.onclick = function(){downloadAttachment(this)};
+
+    var downloadIcon = document.createElement("i");
+    downloadIcon.className = "fa fa-download fa-lg";
+    downloadButton.appendChild(downloadIcon);
+
     btnGroupDiv.appendChild(deleteButton);
     btnGroupDiv.appendChild(editButton);
+    btnGroupDiv.appendChild(downloadButton);
 
     controlTd.appendChild(btnGroupDiv);
 
@@ -358,8 +371,8 @@ function deleteAttachment(buttonClickedElement){
 
     // delete field from attachments object associated with that attachment
     var attachmentName = tr.children[ATTACHMENT_NAME_TD_INDEX].innerHTML;
-    if(attachmentName in attachments){
-        delete attachments[attachmentName];
+    if(attachmentName in attachmentFileStorage){
+        delete attachmentFileStorage[attachmentName];
     }
     // delete tr associated with that attachment
     deleteTrFromTbody(buttonClickedElement);
@@ -382,9 +395,9 @@ function editAttachment(){
 
     // if attachment name was changed remove old and add new one
     if(oldAttachmentName.localeCompare(newAttachmentName) !== 0){
-        var file = attachments[oldAttachmentName];
-        attachments[newAttachmentName] = file;
-        delete attachments[oldAttachmentName];
+        var file = attachmentFileStorage[oldAttachmentName];
+        attachmentFileStorage[newAttachmentName] = file;
+        delete attachmentFileStorage[oldAttachmentName];
 
         // change attachment name it tr
         tr.children[ATTACHMENT_NAME_TD_INDEX].innerHTML = newAttachmentName;
@@ -392,13 +405,60 @@ function editAttachment(){
 
     // if user change file then update attachments associate object
     if(newUploadFileInput.value){
-        attachments[newAttachmentName] = newUploadFileInput.files[0];
-        tr.children[ATTACHMENT_DOWNLOAD_DATE_TD_INDEX].innerHTML = new Date().toDateString();
+        attachmentFileStorage[newAttachmentName] = newUploadFileInput.files[0];
+        var newDate = new Date();
+        tr.children[ATTACHMENT_DOWNLOAD_DATE_TD_INDEX].innerHTML = getDateInValidFormat(newDate);
     }
 
     tr.children[ATTACHMENT_COMMENT_TD_INDEX].innerHTML = newComment;
 
     cancelAttachment();
+}
+
+function deleteCheckedAttachments(checkBoxName){
+    // first find all checked attachments from table
+    var checkBoxes = document.getElementsByName(checkBoxName);
+    // loop over them all and delete checked attachments using delete button on attachment
+    var deleteButtonTdIndex = 4;
+    var deleteButtonIndex = 0;
+    for(var i = 0; i < checkBoxes.length; i++){
+        if(checkBoxes[i].checked){
+            var tr = checkBoxes[i]
+                .parentElement  // get td
+                .parentElement; // get tr
+            var deleteButtonTd = tr.children[deleteButtonTdIndex];
+            var deleteButton = deleteButtonTd
+                .children[0]                    // get btn-group div with control buttons
+                .children[deleteButtonIndex];   // get delete button
+            // delete attachment using onclick function (deleteButton(buttonClickedElement);
+            deleteAttachment(deleteButton);
+            i--;
+        }
+    }
+}
+
+function editCheckedAttachments(checkBoxName){
+    // first find all checked attachments from table
+    var checkBoxes = document.getElementsByName(checkBoxName);
+    // loop over them all and edit checked attachments
+    var editButtonTdIndex = 4;
+    var editButtonIndex = 1;
+    for(var i = 0; i < checkBoxes.length; i++){
+        if(checkBoxes[i].checked){
+            var tr = checkBoxes[i]
+                .parentElement  // get td
+                .parentElement; // get tr
+            var editButtonTd = tr.children[editButtonTdIndex];
+            var editButton = editButtonTd
+                .children[0]                    // get btn-group div with control buttons
+                .children[editButtonIndex];     // get edit button
+            // show attachment modal and send editAttachment() function with edit button element
+            showAttachmentModal(editAttachment, editButton);
+        }
+    }
+}
+
+function downloadAttachment(buttonClicked){
 }
 
 // ///////////////////////////////
@@ -668,14 +728,51 @@ function savePhoto(){
     cancelPhoto();
 }
 
-function getBase64(file) {
-    var reader = new FileReader();
-    reader.readAsDataURL(file);
-    return reader.result;
-}
-
 function cancelPhoto(){
     document.getElementById(PHOTO_MODAL_FILE_ID).value = null;
 
     closePhotoModal();
+}
+
+function deleteCheckedPhones(checkBoxName){
+    // first find all checked attachments from table
+    var checkBoxes = document.getElementsByName(checkBoxName);
+    // loop over them all and delete checked attachments using delete button on attachment
+    var deleteButtonTdIndex = 4;
+    var deleteButtonIndex = 0;
+    for(var i = 0; i < checkBoxes.length; i++){
+        if(checkBoxes[i].checked){
+            var tr = checkBoxes[i]
+                .parentElement  // get td
+                .parentElement; // get tr
+            var deleteButtonTd = tr.children[deleteButtonTdIndex];
+            var deleteButton = deleteButtonTd
+                .children[0]                    // get btn-group div with control buttons
+                .children[deleteButtonIndex];   // get delete button
+            // delete attachment using onclick function (deleteButton(buttonClickedElement);
+            deletePhone(deleteButton);
+            i--;
+        }
+    }
+}
+
+function editCheckedPhones(checkBoxName){
+    // first find all checked attachments from table
+    var checkBoxes = document.getElementsByName(checkBoxName);
+    // loop over them all and edit checked attachments
+    var editButtonTdIndex = 4;
+    var editButtonIndex = 1;
+    for(var i = 0; i < checkBoxes.length; i++){
+        if(checkBoxes[i].checked){
+            var tr = checkBoxes[i]
+                .parentElement  // get td
+                .parentElement; // get tr
+            var editButtonTd = tr.children[editButtonTdIndex];
+            var editButton = editButtonTd
+                .children[0]                    // get btn-group div with control buttons
+                .children[editButtonIndex];     // get edit button
+            // show attachment modal and send editAttachment() function with edit button element
+            showPhoneModal(editPhone, editButton);
+        }
+    }
 }

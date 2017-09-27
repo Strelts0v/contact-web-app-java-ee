@@ -5,12 +5,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Contact {
 
-    private long contactId;
+    private int contactId;
 
     private String surname;
 
@@ -18,7 +17,7 @@ public class Contact {
 
     private String patronymic;
 
-    private Date birthday;
+    private String birthday;
 
     private String gender;
 
@@ -30,11 +29,17 @@ public class Contact {
 
     private String email;
 
+    private String country;
+
+    private String city;
+
+    private String address;
+
+    private String indexNumber;
+
     private String company;
 
     private Photo photo;
-
-    private Address address;
 
     private List<Phone> phones;
 
@@ -50,7 +55,6 @@ public class Contact {
         phones.add(Phone.EMPTY_PHONE);
 
         EMPTY_CONTACT = new Contact(
-                Address.EMPTY_ADDRESS,
                 attachments,
                 phones,
                 Photo.EMPTY_PHOTO
@@ -61,23 +65,25 @@ public class Contact {
      * default public constructor
      */
     public Contact(){
+        this.attachments = new ArrayList<>();
+        this.phones = new ArrayList<>();
+        this.photo = Photo.EMPTY_PHOTO;
     }
 
     /**
      * private constructor to initialize static EMPTY_CONTACT object
      */
-    private Contact(Address address, List<Attachment> attachments, List<Phone> phones, Photo photo){
-        this.address = address;
+    private Contact(List<Attachment> attachments, List<Phone> phones, Photo photo){
         this.attachments = attachments;
         this.phones = phones;
         this.photo = photo;
     }
 
-    public long getContactId() {
+    public int getContactId() {
         return contactId;
     }
 
-    public void setContactId(long contactId) {
+    public void setContactId(int contactId) {
         this.contactId = contactId;
     }
 
@@ -105,11 +111,11 @@ public class Contact {
         this.patronymic = patronymic;
     }
 
-    public Date getBirthday() {
+    public String getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
 
@@ -153,6 +159,38 @@ public class Contact {
         this.email = email;
     }
 
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getIndexNumber() {
+        return indexNumber;
+    }
+
+    public void setIndexNumber(String indexNumber) {
+        this.indexNumber = indexNumber;
+    }
+
     public String getCompany() {
         return company;
     }
@@ -167,14 +205,6 @@ public class Contact {
 
     public void setPhoto(Photo photo) {
         this.photo = photo;
-    }
-
-    public Address getAddress() {
-        return address == null ? Address.EMPTY_ADDRESS : address;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
     }
 
     public List<Phone> getPhones() {
@@ -212,8 +242,12 @@ public class Contact {
                 .append(maritalStatus, contact.maritalStatus)
                 .append(website, contact.website)
                 .append(email, contact.email)
-                .append(company, contact.company)
+                .append(country, contact.country)
+                .append(city, contact.city)
                 .append(address, contact.address)
+                .append(indexNumber, contact.indexNumber)
+                .append(company, contact.company)
+                .append(photo, contact.photo)
                 .append(phones, contact.phones)
                 .append(attachments, contact.attachments)
                 .isEquals();
@@ -232,8 +266,12 @@ public class Contact {
                 .append(maritalStatus)
                 .append(website)
                 .append(email)
-                .append(company)
+                .append(country)
+                .append(city)
                 .append(address)
+                .append(indexNumber)
+                .append(company)
+                .append(photo)
                 .append(phones)
                 .append(attachments)
                 .toHashCode();
@@ -252,8 +290,12 @@ public class Contact {
                 .append("maritalStatus", maritalStatus)
                 .append("website", website)
                 .append("email", email)
-                .append("company", company)
+                .append("country", country)
+                .append("city", city)
                 .append("address", address)
+                .append("indexNumber", indexNumber)
+                .append("company", company)
+                .append("photo", photo)
                 .append("phones", phones)
                 .append("attachments", attachments)
                 .toString();

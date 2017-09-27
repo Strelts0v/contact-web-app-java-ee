@@ -1,8 +1,11 @@
 package com.itechart.app.model.actions;
 
 import com.itechart.app.controller.utils.RequestContent;
+import com.itechart.app.logging.AppLogger;
+import com.itechart.app.model.dao.ContactDao;
 import com.itechart.app.model.dao.JdbcContactDao;
 import com.itechart.app.model.entities.Contact;
+import com.itechart.app.model.exceptions.ContactDaoException;
 import com.itechart.app.model.utils.PageConfigurationManager;
 
 public class GetContactAction implements ContactAction{
@@ -20,17 +23,21 @@ public class GetContactAction implements ContactAction{
 
         final int contactId = (int) requestContent.getAttribute(CONTACT_ATTRIBUTE_ID);
 
-        JdbcContactDao dao = JdbcContactDao.newInstance();
-        if(dao == null){
+        try {
+            ContactDao dao = JdbcContactDao.newInstance();
+            if (dao == null) {
+                page = PageConfigurationManager.getPageName(ERROR_PAGE_NAME);
+            } else {
+                Contact contact = dao.getContact(contactId);
+                requestContent.insertAttribute(CONTACT_ATTRIBUTE_NAME, contact);
+
+                page = PageConfigurationManager.getPageName(CONTACT_DETAIL_PAGE_NAME);
+                dao.closeDao();
+            }
+        } catch (ContactDaoException cde){
+            AppLogger.error(cde.getMessage());
             page = PageConfigurationManager.getPageName(ERROR_PAGE_NAME);
-        } else {
-            Contact contact = dao.getContact(contactId);
-            requestContent.insertAttribute(CONTACT_ATTRIBUTE_NAME, contact);
-
-            page = PageConfigurationManager.getPageName(CONTACT_DETAIL_PAGE_NAME);
-            dao.closeConnection();
         }
-
         return page;
     }
 }

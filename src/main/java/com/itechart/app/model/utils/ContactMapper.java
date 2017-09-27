@@ -2,12 +2,9 @@ package com.itechart.app.model.utils;
 
 
 import com.itechart.app.controller.utils.RequestContent;
-import com.itechart.app.model.entities.Address;
 import com.itechart.app.model.entities.Contact;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 /**
  * transforms info from contact form into new Contact object
@@ -41,17 +38,11 @@ public class ContactMapper {
         contact.setWebsite(requestContent.getParameter(WEBSITE_PARAM));
         contact.setEmail(requestContent.getParameter(EMAIL_PARAM));
         contact.setCompany(requestContent.getParameter(COMPANY_PARAM));
-
-        DateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
-        contact.setBirthday(formatter.parse(requestContent.getParameter(BIRTHDAY_PARAM)));
-
-        Address address = new Address();
-        address.setCountry(requestContent.getParameter(COUNTRY_PARAM));
-        address.setCity(requestContent.getParameter(CITY_PARAM));
-        address.setAddress(requestContent.getParameter(ADDRESS_PARAM));
-        address.setIndex(requestContent.getParameter(INDEX_PARAM));
-
-        contact.setAddress(address);
+        contact.setBirthday(requestContent.getParameter(BIRTHDAY_PARAM).replaceAll(".", "-"));
+        contact.setCountry(requestContent.getParameter(COUNTRY_PARAM));
+        contact.setCity(requestContent.getParameter(CITY_PARAM));
+        contact.setAddress(requestContent.getParameter(ADDRESS_PARAM));
+        contact.setIndexNumber(requestContent.getParameter(INDEX_PARAM));
 
         return contact;
     }

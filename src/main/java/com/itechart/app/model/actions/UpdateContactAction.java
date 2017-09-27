@@ -4,6 +4,7 @@ import com.itechart.app.controller.utils.RequestContent;
 import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.dao.JdbcContactDao;
 import com.itechart.app.model.entities.Contact;
+import com.itechart.app.model.exceptions.ContactDaoException;
 import com.itechart.app.model.utils.ContactMapper;
 import com.itechart.app.model.utils.PageConfigurationManager;
 
@@ -18,7 +19,7 @@ public class UpdateContactAction implements ContactAction{
     private static final String CONTACT_DETAIL_PAGE_NAME = "path.page.jsp.contact-detail";
 
     public String execute(RequestContent requestContent) {
-        String page;
+        String page = null;
 
         final int contactId = Integer.parseInt(requestContent.getParameter(ID_PARAM));
         try {
@@ -42,7 +43,11 @@ public class UpdateContactAction implements ContactAction{
             AppLogger.error(e.getMessage());
             page = PageConfigurationManager.getPageName(ERROR_PAGE_NAME);
             requestContent.insertAttribute(UPDATE_SUCCESS_ATTRIBUTE, false);
+        } catch (ContactDaoException cde){
+            AppLogger.error(cde.getMessage());
+            page = PageConfigurationManager.getPageName(ERROR_PAGE_NAME);
+        } finally {
+            return page;
         }
-        return page;
     }
 }

@@ -30,50 +30,6 @@ public class RestRequestTest {
     }
 
     @Test
-    public void getAddPhoneToContactActionFromValidRestUriTest() throws Exception {
-        final String pathInfo = "/add_phone_to_contact";
-        final RestRequest restRequest = new RestRequest(pathInfo);
-        final String expectedAction = "add_phone_to_contact";
-        final String errorMessage = "Expected action from rest request and actual are different";
-
-        final String resultAction = restRequest.getActionFromRestUrl();
-        Assert.assertEquals(errorMessage, expectedAction, resultAction);
-    }
-
-    @Test
-    public void getDeleteAttachmentFromContactActionFromValidRestUriTest() throws Exception {
-        final String pathInfo = "/delete_attachment_from_contact";
-        final RestRequest restRequest = new RestRequest(pathInfo);
-        final String expectedAction = "delete_attachment_from_contact";
-        final String errorMessage = "Expected action from rest request and actual are different";
-
-        final String resultAction = restRequest.getActionFromRestUrl();
-        Assert.assertEquals(errorMessage, expectedAction, resultAction);
-    }
-
-    @Test
-    public void getDeleteContactActionFromValidRestUriTest() throws Exception {
-        final String pathInfo = "/delete_contact";
-        final RestRequest restRequest = new RestRequest(pathInfo);
-        final String expectedAction = "delete_contact";
-        final String errorMessage = "Expected action from rest request and actual are different";
-
-        final String resultAction = restRequest.getActionFromRestUrl();
-        Assert.assertEquals(errorMessage, expectedAction, resultAction);
-    }
-
-    @Test
-    public void getDeletePhoneFromContactActionFromValidRestUriTest() throws Exception {
-        final String pathInfo = "/delete_phone_from_contact";
-        final RestRequest restRequest = new RestRequest(pathInfo);
-        final String expectedAction = "delete_phone_from_contact";
-        final String errorMessage = "Expected action from rest request and actual are different";
-
-        final String resultAction = restRequest.getActionFromRestUrl();
-        Assert.assertEquals(errorMessage, expectedAction, resultAction);
-    }
-
-    @Test
     public void getGetContactActionFromValidRestUriTest() throws Exception {
         final String pathInfo = "/get_contact/1";
         final RestRequest restRequest = new RestRequest(pathInfo);
@@ -106,7 +62,7 @@ public class RestRequestTest {
 
     @Test
     public void getGetContactsActionFromValidRestUriTest() throws Exception {
-        final String pathInfo = "/get_contacts?offset=0&count=4";
+        final String pathInfo = "/get_contacts?page=1";
         final RestRequest restRequest = new RestRequest(pathInfo);
         final String expectedAction = "get_contacts";
         final String errorMessage = "Expected action from rest request and actual are different";
@@ -138,32 +94,10 @@ public class RestRequestTest {
     }
 
     @Test
-    public void getUpdateAttachmentFromContactActionFromValidRestUriTest() throws Exception {
-        final String pathInfo = "/update_attachment_from_contact";
-        final RestRequest restRequest = new RestRequest(pathInfo);
-        final String expectedAction = "update_attachment_from_contact";
-        final String errorMessage = "Expected action from rest request and actual are different";
-
-        final String resultAction = restRequest.getActionFromRestUrl();
-        Assert.assertEquals(errorMessage, expectedAction, resultAction);
-    }
-
-    @Test
     public void getUpdateContactActionFromValidRestUriTest() throws Exception {
         final String pathInfo = "/update_contact";
         final RestRequest restRequest = new RestRequest(pathInfo);
         final String expectedAction = "update_contact";
-        final String errorMessage = "Expected action from rest request and actual are different";
-
-        final String resultAction = restRequest.getActionFromRestUrl();
-        Assert.assertEquals(errorMessage, expectedAction, resultAction);
-    }
-
-    @Test
-    public void getUpdatePhoneFromContactActionFromValidRestUriTest() throws Exception {
-        final String pathInfo = "/update_phone_from_contact";
-        final RestRequest restRequest = new RestRequest(pathInfo);
-        final String expectedAction = "update_phone_from_contact";
         final String errorMessage = "Expected action from rest request and actual are different";
 
         final String resultAction = restRequest.getActionFromRestUrl();
