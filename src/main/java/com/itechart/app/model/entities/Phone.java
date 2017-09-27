@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class Phone {
 
-    private long phoneId;
+    private int phoneId;
 
     private String phoneNumber;
 
@@ -20,11 +20,11 @@ public class Phone {
         EMPTY_PHONE = new Phone();
     }
 
-    public long getPhoneId() {
+    public int getPhoneId() {
         return phoneId;
     }
 
-    public void setPhoneId(long phoneId) {
+    public void setPhoneId(int phoneId) {
         this.phoneId = phoneId;
     }
 
