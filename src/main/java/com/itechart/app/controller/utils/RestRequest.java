@@ -13,10 +13,10 @@ public class RestRequest {
     private Integer resourceId;
 
     /** list of all patterns according REST api */
-    private List<Pattern> patterns;
+    static private List<Pattern> patterns;
 
     // initialize all patterns according REST API
-    {
+    static {
         patterns = new ArrayList<>();
         patterns.add(Pattern.compile("/create_contact"));
         patterns.add(Pattern.compile("/delete_contact"));
@@ -25,7 +25,6 @@ public class RestRequest {
         patterns.add(Pattern.compile("/search_contact"));
         patterns.add(Pattern.compile("/send_email_to_contacts"));
         patterns.add(Pattern.compile("/update_contact"));
-        patterns.add(Pattern.compile("/add_attachment_to_contact"));
     }
 
 
