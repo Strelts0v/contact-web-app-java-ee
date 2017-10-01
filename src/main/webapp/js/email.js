@@ -36,6 +36,8 @@ function addEmailToSendList(){
     tr.appendChild(tdDelete);
 
     emailTableBody.appendChild(tr);
+
+    addEmailToForm(emailAddress);
 }
 
 function removeEmailFromSendList(element){
@@ -43,6 +45,8 @@ function removeEmailFromSendList(element){
     var tBody = tr.parentElement;
     tBody.removeChild(tr);
 }
+
+const EMAIL_TEMPLATE_INPUT_ID = "email-template";
 
 function selectTemplate(templateValue){
     const BIRTHDAY = "Birthday";
@@ -59,4 +63,13 @@ function selectTemplate(templateValue){
             birthdayFormGroup.style.visibility = "hidden";
             break;
     }
+    var emailTemplateInput = document.getElementById(EMAIL_TEMPLATE_INPUT_ID);
+    emailTemplateInput.value = templateValue;
+}
+
+const EMAILS_TO_SEND_INPUT_ID = "emails-to-send";
+
+function addEmailToForm(emailAddress){
+    var emailsToSendInput = document.getElementById(EMAILS_TO_SEND_INPUT_ID);
+    emailsToSendInput.value += emailAddress + ";";
 }
