@@ -20,17 +20,6 @@ public class ContactActionFactoryTest {
     }
 
     @Test
-    public void defineAddAttachmentToContactActionTest() throws Exception {
-        final String restUrl = "add_attachment_to_contact";
-
-        final String errorMessage
-                = "Expected and actual type of returned ContactAction instance are different";
-
-        final ContactAction action = factory.defineContactAction(restUrl);
-        Assert.assertTrue(errorMessage, action.getClass() == AddAttachmentToContactAction.class);
-    }
-
-    @Test
     public void defineDeleteContactActionTest() throws Exception {
         final String restUrl = "delete_contact";
 
