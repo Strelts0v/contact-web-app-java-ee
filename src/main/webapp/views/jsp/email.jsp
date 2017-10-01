@@ -53,7 +53,7 @@
                                 <label for="form-email-to">To email *</label>
                                 <div class="input-group">
                                     <input id="form-email-to" type="email" name="email-to" class="form-control"
-                                           placeholder="Please enter your email *" required="required"
+                                           placeholder="Please enter email *" required="required"
                                            data-error="Valid email is required.">
                                     <span class="input-group-addon" onclick="addEmailToSendList()">
                                         <i class="fa fa-plus" aria-hidden="true"></i>
