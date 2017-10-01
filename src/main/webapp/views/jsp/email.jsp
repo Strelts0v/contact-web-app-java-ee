@@ -8,6 +8,9 @@
 <c:url value="/api/send_email_to_contacts" var="sendEmailUrl">
     <c:param name="submit" value="false" />
 </c:url>
+<c:url value="/api/send_email_to_contacts" var="sendEmailToContactsUrl">
+    <c:param name="submit" value="true" />
+</c:url>
 
 <html lang="en">
 <head>
@@ -65,38 +68,38 @@
                             <div class="col-md-6">
                                 <table class="table emails">
                                     <tbody id="table-body-emails-to-send">
-                                    <tr>
-                                        <td class="col-md-11">
-                                            <h6 class="list-group-item-text text-left">list Group Item Text</h6>
-                                        </td>
-                                        <td class="col-md-1">
-                                            <button class="btn btn-sm btn-danger" onclick="removeEmailFromSendList(this)">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                    <c:forEach var="email" items="${emailsToSend}">
+                                        <tr>
+                                            <td class="col-md-11"><h6>${email}</h6></td>
+                                            <td class="col-md-1">
+                                                <button class="btn btn-sm btn-danger" onclick="removeEmailFromSendList(this)">
+                                                    <i class="fa fa-times"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
                                     </tbody>
                                 </table>
                             </div>
                           </div>
                         </div>
 
-                        <form id="contact-form" method="post" action="" role="form">
+                        <form id="contact-form" method="post" action="${sendEmailToContactsUrl}" role="form">
 
                             <div class="messages"></div>
 
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="form_name">Firstname *</label>
-                                        <input id="form_name" type="text" name="name" class="form-control" placeholder="Please enter your firstname *" required="required" data-error="Firstname is required.">
+                                        <label for="form-name">Firstname *</label>
+                                        <input id="form-name" type="text" name="firstname" class="form-control" placeholder="Please enter your firstname *" required="required" data-error="Firstname is required.">
                                         <div class="help-block with-errors"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="form_lastname">Lastname *</label>
-                                        <input id="form_lastname" type="text" name="surname" class="form-control" placeholder="Please enter your lastname *" required="required" data-error="Lastname is required.">
+                                        <label for="form-lastname">Lastname *</label>
+                                        <input id="form-lastname" type="text" name="lastname" class="form-control" placeholder="Please enter your lastname *" required="required" data-error="Lastname is required.">
                                         <div class="help-block with-errors"></div>
                                     </div>
                                 </div>
@@ -124,7 +127,7 @@
                                         <label for="birthday-first-name">Birthday person first name *</label>
                                         <input id="birthday-first-name" type="text" name="birthday-first-name" class="form-control"
                                                placeholder="Please enter first name who celebrates birthday *"
-                                               required="required" data-error="first name is required.">
+                                               data-error="first name is required.">
                                         <div class="help-block with-errors"></div>
                                     </div>
                                 </div>
@@ -133,10 +136,24 @@
                                         <label for="birthday-last-name">Birthday person last name *</label>
                                         <input id="birthday-last-name" type="text" name="birthday-last-name"
                                                class="form-control" placeholder="Please enter last name who celebrates birthday *"
-                                               required="required" data-error="last name is required.">
+                                               data-error="last name is required.">
                                         <div class="help-block with-errors"></div>
                                     </div>
                                 </div>
+                            </div>
+                            <div class ="row">
+                                <div class="col-md-6 select-template">
+                                    <div class="form-group">
+                                        <label for="form-subject">Subject *</label>
+                                        <input id="form-subject" type="text" name="subject" class="form-control" placeholder="Please enter subject *" required="required" data-error="Subject is required.">
+                                        <div class="help-block with-errors"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hidden">
+                                <input type="text" id="emails-to-send" name="emails-to-send">
+                                <input type="text" id="email-template" name="email-template" value="Default">
                             </div>
 
                             <div class="row">
@@ -148,8 +165,20 @@
                                         <div class="help-block with-errors"></div>
                                     </div>
                                 </div>
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <input type="submit" class="btn btn-success btn-send" value="Send message">
+                                </div>
+                                <div class="col-md-6">
+                                <c:if test="${wasSend == true}">
+                                    <div class="alert alert-success">
+                                        <strong>Email was successfully sent!</strong>
+                                    </div>
+                                </c:if>
+                                <c:if test="${wasSend == false}">
+                                    <div class="alert alert-warning">
+                                        <strong>Email wasn't sent!</strong>
+                                    </div>
+                                </c:if>
                                 </div>
                             </div>
                             <div class="row">

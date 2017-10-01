@@ -37,6 +37,21 @@ public class ContactActionProperties {
 
     // Email contact action properties
     public final static String EMAIL_SUBMIT_PARAM = "submit";
+    public final static String EMAILS_TO_SEND_PARAM = "emails-to-send";
+    public final static String EMAIL_TEMPLATE_PARAM = "email-template";
+    public final static String EMAIL_BIRTHDAY_LAST_NAME_PARAM = "birthday-last-name";
+    public final static String EMAIL_BIRTHDAY_FIRST_NAME_PARAM = "birthday-first-name";
+    public final static String EMAIL_PHONE_PARAM = "phone";
+    public final static String EMAIL_FROM_PARAM = "email";
+    public final static String EMAIL_FIRST_NAME_PARAM = "firstname";
+    public final static String EMAIL_LAST_NAME_PARAM = "lastname";
+    public final static String WAS_SENDING_EMAIL_SUCCESSFUL_REQUEST_ATTRIBUTE = "wasSend";
+    public final static Boolean SENDING_EMAIL_WAS_SUCCESSFUL = true;
+    public final static Boolean SENDING_EMAIL_WAS_UNSUCCESSFUL = false;
+    public final static String EMAIL_MESSAGE_PARAM = "message";
+    public final static String EMAIL_SUBJECT_PARAM = "subject";
+    public final static String EMAIL_INITIAL_EMAILS_TO_SEND_PARAM = "emails-ids-to-send";
+    public final static String EMAIL_INITIAL_EMAIL_TO_SEND_REQUEST_ATTRIBUTE = "emailsToSend";
 
     // Get contacts action properties
     public final static String CONTACT_PAGE_PARAM_NAME = "page";

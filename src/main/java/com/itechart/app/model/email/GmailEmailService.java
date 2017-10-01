@@ -1,7 +1,9 @@
 package com.itechart.app.model.email;
 
+import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.cryptography.Cryptographer;
 import com.itechart.app.model.cryptography.CryptographerXor;
+import com.itechart.app.model.exceptions.EmailSendingException;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -51,7 +53,8 @@ public class GmailEmailService implements EmailService {
     }
 
     @Override
-    public void sendMessage(String fromEmail, String toEmail, String subject, String messageText) {
+    public void sendMessage(String fromEmail, String toEmail, String subject, String messageText)
+            throws EmailSendingException {
         try {
             Message message = new MimeMessage(SESSION);
             message.setFrom(new InternetAddress(fromEmail));
@@ -59,8 +62,9 @@ public class GmailEmailService implements EmailService {
             message.setSubject(subject);
             message.setText(messageText);
             Transport.send(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
+        } catch (MessagingException me) {
+            AppLogger.error(me.getMessage());
+            throw new EmailSendingException(me);
         }
     }
 }

@@ -46,7 +46,7 @@
         <a type="button" class="btn btn-warning btn-md" href="${createContactUrl}">
             <i class="fa fa-pencil fa-lg" aria-hidden="true"></i> New contact
         </a>
-        <button type="button" class="btn btn-info btn-md" onclick="">
+        <button type="button" class="btn btn-info btn-md" onclick="sendEmailToCheckedContacts()">
             <i class="fa fa-envelope-o fa-lg" aria-hidden="true"></i> Send email
         </button>
         <hr>
@@ -80,7 +80,7 @@
                             <button class="btn btn-sm btn-warning" onclick="editContact(this)">
                                 <i class="fa fa-pencil fa-lg"></i>
                             </button>
-                            <button class="btn btn-sm btn-info">
+                            <button class="btn btn-sm btn-info" onclick="sendEmail(this)">
                                 <i class="fa fa-envelope-o fa-lg"></i>
                             </button>
                         </div>

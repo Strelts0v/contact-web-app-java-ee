@@ -1,5 +1,8 @@
 package com.itechart.app.model.email;
 
+import com.itechart.app.logging.AppLogger;
+import com.itechart.app.model.exceptions.EmailSendingException;
+
 import java.util.List;
 
 /**
@@ -53,7 +56,11 @@ public class EmailSender implements Runnable {
      */
     public void run() {
         for(String to : destinationEmailList) {
-            service.sendMessage(from, to, subject, messageText);
+            try {
+                service.sendMessage(from, to, subject, messageText);
+            } catch (EmailSendingException ese){
+                AppLogger.error(ese.getMessage());
+            }
         }
     }
 

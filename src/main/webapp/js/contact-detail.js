@@ -30,146 +30,13 @@ var formData = new FormData();
 // css class names
 const PHONE_CLASS_NAME = "phoneItem";
 
-function createContact(){
-    // contact info properties
-    const surname = document.getElementById(SURNAME_INPUT_ID).value;
-    const firstName = document.getElementById(FIRSTNAME_INPUT_ID).value;
-    const patronymic = document.getElementById(PATRONYMIC_INPUT_ID).value;
-    const birthday = document.getElementById(BIRTHDAY_INPUT_ID).value;
-    const gender = document.getElementById(GENDER_INPUT_ID).value;
-    const nationality = document.getElementById(NATIONALITY_INPUT_ID).value;
-    const marital_status = document.getElementById(MARITAL_STATUS_INPUT_ID).value;
-    const website = document.getElementById(WEBSITE_INPUT_ID).value;
-    const email = document.getElementById(EMAIL_INPUT_ID).value;
-    const company = document.getElementById(COMPANY_INPUT_ID).value;
-    const country = document.getElementById(COUNTRY_INPUT_ID).value;
-    const city = document.getElementById(CITY_INPUT_ID).value;
-    const address = document.getElementById(ADDRESS_INPUT_ID).value;
-    const index = document.getElementById(INDEX_INPUT_ID).value;
-
-    formData.append(SURNAME_INPUT_ID, surname);
-    formData.append(FIRSTNAME_INPUT_ID, firstName);
-    formData.append(PATRONYMIC_INPUT_ID, patronymic);
-    formData.append(BIRTHDAY_INPUT_ID, birthday);
-    formData.append(GENDER_INPUT_ID, gender);
-    formData.append(NATIONALITY_INPUT_ID, nationality);
-    formData.append(MARITAL_STATUS_INPUT_ID, marital_status);
-    formData.append(WEBSITE_INPUT_ID, website);
-    formData.append(EMAIL_INPUT_ID, email);
-    formData.append(COMPANY_INPUT_ID, company);
-    formData.append(COUNTRY_INPUT_ID, country);
-    formData.append(CITY_INPUT_ID, city);
-    formData.append(ADDRESS_INPUT_ID, address);
-    formData.append(INDEX_INPUT_ID, index);
-
-    var phoneTableRows = document.getElementsByClassName(PHONE_CLASS_NAME);
-    var phones = [];
-    for(var i = 0; i < phoneTableRows.length; i++){
-        phones[i] = parsePhone(phoneTableRows[i].innerText, phoneTableRows[i].cells[0].innerHTML)
-    }
-    var phonesJson = JSON.stringify(phones);
-    formData.append(PHONES_PARAM_NAME, phonesJson);
-
-    // get all attachments properties
-    var attachmentTableBody = document.getElementById(ATTACHMENT_TABLE_BODY_ID);
-    var attachmentTableRows = attachmentTableBody.children;
-    var attachments = [];
-    for(var i = 0; i < attachmentTableRows.length; i++){
-        attachments[i] = parseAttachment(attachmentTableRows[i]);
-    }
-    var attachmentsJson = JSON.stringify(attachments);
-    formData.append(ATTACHMENTS_PARAM_NAME, attachmentsJson);
-
-    // add new attachments to formData for sending to the server
-    for(var attachmentName in attachmentFileStorage){
-        formData.append(attachmentName, attachmentFileStorage[attachmentName]);
-    }
-
-    // add current contact photo to formData for sending to the server
-    formData.append(PHOTO_PARAM_NAME, currentPhoto);
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("post", "/api/create_contact?submit=true", false);
-    xhr.send(formData);
-    location.reload();
-
-    formData = new FormData();
-}
-
-function updateContact(){
-    // contact info properties
-    const contactId = document.getElementById(ID_CONTACT_INPUT_ID).value;
-    const surname = document.getElementById(SURNAME_INPUT_ID).value;
-    const firstName = document.getElementById(FIRSTNAME_INPUT_ID).value;
-    const patronymic = document.getElementById(PATRONYMIC_INPUT_ID).value;
-    const birthday = document.getElementById(BIRTHDAY_INPUT_ID).value;
-    const gender = document.getElementById(GENDER_INPUT_ID).value;
-    const nationality = document.getElementById(NATIONALITY_INPUT_ID).value;
-    const marital_status = document.getElementById(MARITAL_STATUS_INPUT_ID).value;
-    const website = document.getElementById(WEBSITE_INPUT_ID).value;
-    const email = document.getElementById(EMAIL_INPUT_ID).value;
-    const company = document.getElementById(COMPANY_INPUT_ID).value;
-    const country = document.getElementById(COUNTRY_INPUT_ID).value;
-    const city = document.getElementById(CITY_INPUT_ID).value;
-    const address = document.getElementById(ADDRESS_INPUT_ID).value;
-    const index = document.getElementById(INDEX_INPUT_ID).value;
-
-    formData.append(ID_CONTACT_INPUT_ID, contactId);
-    formData.append(SURNAME_INPUT_ID, surname);
-    formData.append(FIRSTNAME_INPUT_ID, firstName);
-    formData.append(PATRONYMIC_INPUT_ID, patronymic);
-    formData.append(BIRTHDAY_INPUT_ID, birthday);
-    formData.append(GENDER_INPUT_ID, gender);
-    formData.append(NATIONALITY_INPUT_ID, nationality);
-    formData.append(MARITAL_STATUS_INPUT_ID, marital_status);
-    formData.append(WEBSITE_INPUT_ID, website);
-    formData.append(EMAIL_INPUT_ID, email);
-    formData.append(COMPANY_INPUT_ID, company);
-    formData.append(COUNTRY_INPUT_ID, country);
-    formData.append(CITY_INPUT_ID, city);
-    formData.append(ADDRESS_INPUT_ID, address);
-    formData.append(INDEX_INPUT_ID, index);
-
-    var phoneTableRows = document.getElementsByClassName(PHONE_CLASS_NAME);
-    var phones = [];
-    for(var i = 0; i < phoneTableRows.length; i++){
-        phones[i] = parsePhone(phoneTableRows[i])
-    }
-    var phonesJson = JSON.stringify(phones);
-    formData.append(PHONES_PARAM_NAME, phonesJson);
-
-    // get all attachments properties
-    var attachmentTableBody = document.getElementById(ATTACHMENT_TABLE_BODY_ID);
-    var attachmentTableRows = attachmentTableBody.children;
-    var attachments = [];
-    for(var i = 0; i < attachmentTableRows.length; i++){
-        attachments[i] = parseAttachment(attachmentTableRows[i]);
-    }
-    var attachmentsJson = JSON.stringify(attachments);
-    formData.append(ATTACHMENTS_PARAM_NAME, attachmentsJson);
-
-    // add new attachments to formData for sending to the server
-    for(var attachmentName in attachmentFileStorage){
-        formData.append(attachmentName, attachmentFileStorage[attachmentName]);
-    }
-
-    // add current contact photo to formData for sending to the server
-    formData.append(PHOTO_PARAM_NAME, currentPhoto);
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("post", "/api/update_contact", false);
-    xhr.send(formData);
-    location.reload();
-
-    formData = new FormData();
-}
-
 function parsePhone(tr){
     var phone = {};
     phone.phoneId = parsePhoneId(tr);
     phone.phoneNumber = parsePhoneNumber(tr);
     phone.phoneType = parsePhoneType(tr);
     phone.comment = parsePhoneComment(tr);
+
     return phone;
 }
 
@@ -842,4 +709,138 @@ function editCheckedPhones(checkBoxName){
             showPhoneModal(editPhone, editButton);
         }
     }
+}
+
+function createContact(){
+    // contact info properties
+    const surname = document.getElementById(SURNAME_INPUT_ID).value;
+    const firstName = document.getElementById(FIRSTNAME_INPUT_ID).value;
+    const patronymic = document.getElementById(PATRONYMIC_INPUT_ID).value;
+    const birthday = document.getElementById(BIRTHDAY_INPUT_ID).value;
+    const gender = document.getElementById(GENDER_INPUT_ID).value;
+    const nationality = document.getElementById(NATIONALITY_INPUT_ID).value;
+    const marital_status = document.getElementById(MARITAL_STATUS_INPUT_ID).value;
+    const website = document.getElementById(WEBSITE_INPUT_ID).value;
+    const email = document.getElementById(EMAIL_INPUT_ID).value;
+    const company = document.getElementById(COMPANY_INPUT_ID).value;
+    const country = document.getElementById(COUNTRY_INPUT_ID).value;
+    const city = document.getElementById(CITY_INPUT_ID).value;
+    const address = document.getElementById(ADDRESS_INPUT_ID).value;
+    const index = document.getElementById(INDEX_INPUT_ID).value;
+
+    formData.append(SURNAME_INPUT_ID, surname);
+    formData.append(FIRSTNAME_INPUT_ID, firstName);
+    formData.append(PATRONYMIC_INPUT_ID, patronymic);
+    formData.append(BIRTHDAY_INPUT_ID, birthday);
+    formData.append(GENDER_INPUT_ID, gender);
+    formData.append(NATIONALITY_INPUT_ID, nationality);
+    formData.append(MARITAL_STATUS_INPUT_ID, marital_status);
+    formData.append(WEBSITE_INPUT_ID, website);
+    formData.append(EMAIL_INPUT_ID, email);
+    formData.append(COMPANY_INPUT_ID, company);
+    formData.append(COUNTRY_INPUT_ID, country);
+    formData.append(CITY_INPUT_ID, city);
+    formData.append(ADDRESS_INPUT_ID, address);
+    formData.append(INDEX_INPUT_ID, index);
+
+    var phoneTableRows = document.getElementsByClassName(PHONE_CLASS_NAME);
+    var phones = [];
+    for(var i = 0; i < phoneTableRows.length; i++){
+        phones[i] = parsePhone(phoneTableRows[i].innerText, phoneTableRows[i].cells[0].innerHTML)
+    }
+    var phonesJson = JSON.stringify(phones);
+    formData.append(PHONES_PARAM_NAME, phonesJson);
+
+    // get all attachments properties
+    var attachmentTableBody = document.getElementById(ATTACHMENT_TABLE_BODY_ID);
+    var attachmentTableRows = attachmentTableBody.children;
+    var attachments = [];
+    for(var i = 0; i < attachmentTableRows.length; i++){
+        attachments[i] = parseAttachment(attachmentTableRows[i]);
+    }
+    var attachmentsJson = JSON.stringify(attachments);
+    formData.append(ATTACHMENTS_PARAM_NAME, attachmentsJson);
+
+    // add new attachments to formData for sending to the server
+    for(var attachmentName in attachmentFileStorage){
+        formData.append(attachmentName, attachmentFileStorage[attachmentName]);
+    }
+
+    // add current contact photo to formData for sending to the server
+    formData.append(PHOTO_PARAM_NAME, currentPhoto);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("post", "/api/create_contact?submit=true", false);
+    xhr.send(formData);
+    location.reload();
+
+    formData = new FormData();
+}
+
+function updateContact(){
+    // contact info properties
+    const contactId = document.getElementById(ID_CONTACT_INPUT_ID).value;
+    const surname = document.getElementById(SURNAME_INPUT_ID).value;
+    const firstName = document.getElementById(FIRSTNAME_INPUT_ID).value;
+    const patronymic = document.getElementById(PATRONYMIC_INPUT_ID).value;
+    const birthday = document.getElementById(BIRTHDAY_INPUT_ID).value;
+    const gender = document.getElementById(GENDER_INPUT_ID).value;
+    const nationality = document.getElementById(NATIONALITY_INPUT_ID).value;
+    const marital_status = document.getElementById(MARITAL_STATUS_INPUT_ID).value;
+    const website = document.getElementById(WEBSITE_INPUT_ID).value;
+    const email = document.getElementById(EMAIL_INPUT_ID).value;
+    const company = document.getElementById(COMPANY_INPUT_ID).value;
+    const country = document.getElementById(COUNTRY_INPUT_ID).value;
+    const city = document.getElementById(CITY_INPUT_ID).value;
+    const address = document.getElementById(ADDRESS_INPUT_ID).value;
+    const index = document.getElementById(INDEX_INPUT_ID).value;
+
+    formData.append(ID_CONTACT_INPUT_ID, contactId);
+    formData.append(SURNAME_INPUT_ID, surname);
+    formData.append(FIRSTNAME_INPUT_ID, firstName);
+    formData.append(PATRONYMIC_INPUT_ID, patronymic);
+    formData.append(BIRTHDAY_INPUT_ID, birthday);
+    formData.append(GENDER_INPUT_ID, gender);
+    formData.append(NATIONALITY_INPUT_ID, nationality);
+    formData.append(MARITAL_STATUS_INPUT_ID, marital_status);
+    formData.append(WEBSITE_INPUT_ID, website);
+    formData.append(EMAIL_INPUT_ID, email);
+    formData.append(COMPANY_INPUT_ID, company);
+    formData.append(COUNTRY_INPUT_ID, country);
+    formData.append(CITY_INPUT_ID, city);
+    formData.append(ADDRESS_INPUT_ID, address);
+    formData.append(INDEX_INPUT_ID, index);
+
+    var phoneTableRows = document.getElementsByClassName(PHONE_CLASS_NAME);
+    var phones = [];
+    for(var i = 0; i < phoneTableRows.length; i++){
+        phones[i] = parsePhone(phoneTableRows[i])
+    }
+    var phonesJson = JSON.stringify(phones);
+    formData.append(PHONES_PARAM_NAME, phonesJson);
+
+    // get all attachments properties
+    var attachmentTableBody = document.getElementById(ATTACHMENT_TABLE_BODY_ID);
+    var attachmentTableRows = attachmentTableBody.children;
+    var attachments = [];
+    for(var i = 0; i < attachmentTableRows.length; i++){
+        attachments[i] = parseAttachment(attachmentTableRows[i]);
+    }
+    var attachmentsJson = JSON.stringify(attachments);
+    formData.append(ATTACHMENTS_PARAM_NAME, attachmentsJson);
+
+    // add new attachments to formData for sending to the server
+    for(var attachmentName in attachmentFileStorage){
+        formData.append(attachmentName, attachmentFileStorage[attachmentName]);
+    }
+
+    // add current contact photo to formData for sending to the server
+    formData.append(PHOTO_PARAM_NAME, currentPhoto);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("post", "/api/update_contact", false);
+    xhr.send(formData);
+    location.reload();
+
+    formData = new FormData();
 }
