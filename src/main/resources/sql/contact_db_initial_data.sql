@@ -1,43 +1,41 @@
-use contact_db;
+USE `contact_db`;
 
-insert into addresses(
-country, city, address, index_number) values
-("Belarus", "Minsk", "Prushinskih 5", "234001");
+INSERT INTO nationalities(nationality) VALUES
+("Russian"),
+("Belarus"),
+("Ukrainian");
 
-insert into companies(company) values
-("iTechArt");
+INSERT INTO companies(company) VALUES
+("iTechArt"),
+("Epam"),
+("ITransition");
 
-insert into genders(gender) values
-("Male"),
-("Female");
+INSERT INTO photos(photo) VALUES
+(NULL);
 
-insert into nationalities(nationality) values
-("Belarus");
+INSERT INTO contacts(first_name, surname, patronymic,
+	birthday, website, email, country, city, address,
+	index_number, gender, marital_status, id_nationality,
+	id_company, id_photo) VALUES
+("Ivan", "Vasilevskiy", "Aleksandr", "1998-04-07", "www.github.com/Vasilevskiy", "ivan.vasilevskiy@gmail.com", "Belarus", "Soligorsk", "Zheleznay 5/44", "220001", "Male", "Single", 1, 1, 1),
+("Alexey", "Fedorov", "Aleksandr", "1998-08-11", "www.github.com/Feodorov", "alexey.fedorov@gmail.com", "Belarus", "Smorgon", "Vileyskaya 90/47", "220022", "Male", "Single", 1, 2, 2),
+("Sergey", "Pastushenko", "Aleksandr", "1998-12-07", "www.github.com/Pastushenko", "sergey.pastushenko@gmail.com", "Belarus", "Brest", "Zelenaya 14", "220034", "Male", "Single", 1, 3, 3),
+("Ivan", "Vasilevskiy", "Aleksandr", "1998-04-07", "www.github.com/Vasilevskiy", "ivan.vasilevskiy@gmail.com", "Belarus", "Soligorsk", "Zeleznay 5/44", "220001", "Male", "Single", 1, 1, 4),
+("Ivan", "Vasilevskiy", "Aleksandr", "1998-04-07", "www.github.com/Vasilevskiy", "ivan.vasilevskiy@gmail.com", "Belarus", "Soligorsk", "Zeleznay 5/44", "220001", "Male", "Single", 1, 1, 5),
+("Ivan", "Vasilevskiy", "Aleksandr", "1998-04-07", "www.github.com/Vasilevskiy", "ivan.vasilevskiy@gmail.com", "Belarus", "Soligorsk", "Zeleznay 5/44", "220001", "Male", "Single", 1, 1, 6),
+("Ivan", "Vasilevskiy", "Aleksandr", "1998-04-07", "www.github.com/Vasilevskiy", "ivan.vasilevskiy@gmail.com", "Belarus", "Soligorsk", "Zeleznay 5/44", "220001", "Male", "Single", 1, 1, 7),
+("Ivan", "Vasilevskiy", "Aleksandr", "1998-04-07", "www.github.com/Vasilevskiy", "ivan.vasilevskiy@gmail.com", "Belarus", "Soligorsk", "Zeleznay 5/44", "220001", "Male", "Single", 1, 1, 8),
+("Ivan", "Vasilevskiy", "Aleksandr", "1998-04-07", "www.github.com/Vasilevskiy", "ivan.vasilevskiy@gmail.com", "Belarus", "Soligorsk", "Zeleznay 5/44", "220001", "Male", "Single", 1, 1, 9),
+("Ivan", "Vasilevskiy", "Aleksandr", "1998-04-07", "www.github.com/Vasilevskiy", "ivan.vasilevskiy@gmail.com", "Belarus", "Soligorsk", "Zeleznay 5/44", "220001", "Male", "Single", 1, 1, 10);
 
-insert into marital_status(marital_status_name) values
-("Single"),
-("In a relationship"),
-("Married");
+INSERT INTO phones(id_contact, phone_number, phone_type, commentary)
+VALUES
+(1, "+375291111111", "Mobile", "comment"),
+(1, "+375292222222", "Home", "comment"),
+(1, "+375293333333", "Working", "comment");
 
-insert into contacts(
-first_name, surname, patronymic, birthday, website,
-email, id_address, id_company, id_gender,
-id_nationality, id_marital_status) values
-("test first_name", "test surname", "test patronymic",
-"2017-07-04", "test website", "test email", 1, 1, 1, 1, 1);
-
-insert into phone_types(phone_type) values
-("Mobile"),
-("Home"),
-("Working");
-
-insert into photos(id_contact) values
-(1);
-
-insert into attachments(id_contact, name, download_date,
-commentary) values
-(1, "XXX", "2017-07-04", "test comment");
-
-insert into phones(id_contact, phone_number,
-id_phone_type, commentary) values
-(1, "+375294444444", 1, "test comment");
+INSERT INTO attachments(id_contact, name, download_date,
+commentary, attachment) VALUES
+(1, "file1", "2017-07-01", "comment", NULL),
+(1, "file2", "2017-07-02", "comment", NULL),
+(1, "file3", "2017-07-03", "comment", NULL);
