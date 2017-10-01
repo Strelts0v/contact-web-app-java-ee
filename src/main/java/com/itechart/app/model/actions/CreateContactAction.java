@@ -2,53 +2,127 @@ package com.itechart.app.model.actions;
 
 import com.itechart.app.controller.utils.RequestContent;
 import com.itechart.app.logging.AppLogger;
+import com.itechart.app.model.actions.utils.ContactActionProperties;
+import com.itechart.app.model.dao.ContactDao;
 import com.itechart.app.model.dao.JdbcContactDao;
+import com.itechart.app.model.entities.Attachment;
 import com.itechart.app.model.entities.Contact;
+import com.itechart.app.model.entities.Phone;
+import com.itechart.app.model.entities.Photo;
 import com.itechart.app.model.exceptions.ContactDaoException;
-import com.itechart.app.model.utils.ContactMapper;
-import com.itechart.app.model.utils.PageConfigurationManager;
+import com.itechart.app.model.utils.*;
+import org.apache.commons.fileupload.FileItem;
 
-import java.text.ParseException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CreateContactAction implements ContactAction{
 
-    // request attribute value
-    private static final String CONTACT_REQUEST_ATTRIBUTE = "contact";
+    private Map<String, String> contactPropertiesMap;
+    private Map<String, Attachment> attachmentsMap;
+    private List<Phone> phones;
+    private Photo photo = Photo.EMPTY_PHOTO;
 
-    // param to identify client want only get page with form
-    // or create new contact
-    private static final String CONTACT_SUBMIT_PARAM = "contact_submit";
-
-    private final static String ERROR_PAGE_NAME = "path.page.jsp.error";
-    private final static String CONTACT_DETAIL_PAGE_NAME = "path.page.jsp.contact-detail";
+    public CreateContactAction(){
+        contactPropertiesMap = new HashMap<>();
+        attachmentsMap = new HashMap<>();
+    }
 
     public String execute(RequestContent requestContent) {
         String page;
 
-        Boolean isSubmit = Boolean.valueOf(requestContent.getParameter(CONTACT_SUBMIT_PARAM));
+        Boolean isSubmit = Boolean.valueOf(requestContent.getParameter(
+                ContactActionProperties.CONTACT_SUBMIT_PARAM));
         if(!isSubmit){
-            page = PageConfigurationManager.getPageName(CONTACT_DETAIL_PAGE_NAME);
+            page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_DETAIL_PAGE_NAME);
         } else {
-            try {
-                Contact contact = ContactMapper.mapContactParams(requestContent);
-
-                JdbcContactDao dao = JdbcContactDao.newInstance();
-                if (dao == null) {
-                    page = PageConfigurationManager.getPageName(ERROR_PAGE_NAME);
+            // parse FileItem objects into Contact entities
+            List<FileItem> items = (List<FileItem>) requestContent.getAttribute(ContactActionProperties.FILE_ITEMS_ATTRIBUTE);
+            for (FileItem item : items) {
+                if (item.isFormField()) {
+                    handleFormField(item);
                 } else {
-                    contact = dao.createContact(contact);
-                    requestContent.insertAttribute(CONTACT_REQUEST_ATTRIBUTE, contact);
-                    page = PageConfigurationManager.getPageName(CONTACT_DETAIL_PAGE_NAME);
-                    dao.closeConnection();
+                    handleFile(item);
                 }
-            } catch (ParseException pe) {
-                AppLogger.error(pe.getMessage());
-                page = PageConfigurationManager.getPageName(ERROR_PAGE_NAME);
-            } catch (ContactDaoException cde){
+            }
+            // Map contacts properties
+            Contact contact = ContactMapper.mapContactParams(contactPropertiesMap);
+            contact.setPhoto(photo);
+
+            ContactDao dao = null;
+            try {
+                dao = JdbcContactDao.newInstance();
+                if (dao == null) {
+                    page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
+                } else {
+                    // start jdbc transaction
+                    dao.initializeDao();
+                    contact = dao.createContact(contact);
+                    // add new attachments
+                    for(Attachment attachment : attachmentsMap.values()){
+                        attachment.setContactId(contact.getContactId());
+                        dao.addAttachmentToContact(contact.getContactId(), attachment);
+                    }
+                    // add new phone
+                    for(Phone phone : phones){
+                        phone.setContactId(contact.getContactId());
+                        dao.addPhoneToContact(contact.getContactId(), phone);
+                    }
+                    // save updated contact as attribute for sending on client
+                    contact = dao.getContact(contact.getContactId());
+                    requestContent.insertAttribute(ContactActionProperties.CONTACT_REQUEST_ATTRIBUTE, contact);
+                    requestContent.insertAttribute(
+                            ContactActionProperties.WAS_CONTACT_SUCCESSFULLY_SAVED_REQUEST_ATTRIBUTE,
+                            ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
+
+                    dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
+
+                    page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_DETAIL_PAGE_NAME);
+                }
+            }catch (ContactDaoException cde){
                 AppLogger.error(cde.getMessage());
-                page = PageConfigurationManager.getPageName(ERROR_PAGE_NAME);
+                if(dao != null) {
+                    try {
+                        dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_UNSUCCESSFUL);
+                    } catch (ContactDaoException cdex){
+                        AppLogger.error(cdex.getMessage());
+                    }
+                }
+                page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
             }
         }
         return page;
+    }
+
+    private void handleFormField(FileItem item){
+        if(item.getFieldName().equals(ContactActionProperties.PHONES_PARAM)){
+            phones = PhoneParser.parsePhones(item);
+        } else if (item.getFieldName().equals(ContactActionProperties.ATTACHMENTS_PARAM)){
+            List<Attachment> attachments = AttachmentParser.parseAttachments(item);
+            for(Attachment attachment: attachments){
+                attachmentsMap.put(attachment.getFileName(), attachment);
+            }
+        } else {
+            contactPropertiesMap.put(item.getFieldName(), item.getString());
+        }
+    }
+
+    private void handleFile(FileItem item){
+        try {
+            if (item.getFieldName().equals(ContactActionProperties.PHOTO_PARAM)) {
+                photo = PhotoParser.parsePhoto(item);
+                return;
+            }
+
+            Attachment attachment = attachmentsMap.get(item.getFieldName());
+            if (attachment != null) {
+                attachment.setFileStream(item.getInputStream());
+                attachment.setFileSize((int) item.getSize());
+            }
+        } catch (IOException e){
+            AppLogger.error(e.getMessage());
+        }
     }
 }
