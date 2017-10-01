@@ -4,17 +4,23 @@
 <%@taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-<c:url value="/api/get_contacts" var="getContactsUrl" />
-<c:url value="/api/create_contact" var="createContactUrl" />
+<c:url value="/api/create_contact" var="createContactUrl">
+    <c:param name="submit" value="false" />
+</c:url>
+
+<c:url value="/api/send_email_to_contacts" var="sendEmailToContactsUrl">
+    <c:param name="submit" value="false" />
+</c:url>
+
 <c:url value="/api/" var="var2" />
 <c:url value="/api/get_contacts?page=" var="getContactPageUrl" />
 
 <c:url value="/api/get_contact/" var="getContactByIdUrl" />
 <c:url value="/api/delete_contact" var="deleteContactsUrl" />
+<c:url value="/api/get_contacts" var="getContactsUrl" />
 
 <html lang="en">
 <head>
-    <link href="../../css/styles.css" rel="stylesheet">
     <link href="../../css/bootstrap.min.css" rel="stylesheet">
     <link href="../../css/font-awesome.min.css" rel="stylesheet">
     <link href="../../css/navbar.css" rel="stylesheet">
@@ -68,10 +74,10 @@
                     <td><c:out value="${contact.company}"/></td>
                     <td class="col-xs-2">
                         <div class="btn-group">
-                            <button class="btn btn-sm btn-danger" onclick="">
+                            <button class="btn btn-sm btn-danger" onclick="deleteContact(this)">
                                 <i class="fa fa-trash-o fa-lg"></i>
                             </button>
-                            <button class="btn btn-sm btn-warning" onclick="">
+                            <button class="btn btn-sm btn-warning" onclick="editContact(this)">
                                 <i class="fa fa-pencil fa-lg"></i>
                             </button>
                             <button class="btn btn-sm btn-info">
