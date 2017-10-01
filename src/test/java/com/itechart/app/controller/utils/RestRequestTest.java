@@ -19,17 +19,6 @@ public class RestRequestTest {
     }
 
     @Test
-    public void getAddAttachmentToContactActionFromValidRestUriTest() throws Exception {
-        final String pathInfo = "/add_attachment_to_contact";
-        final RestRequest restRequest = new RestRequest(pathInfo);
-        final String expectedAction = "add_attachment_to_contact";
-        final String errorMessage = "Expected action from rest request and actual are different";
-
-        final String resultAction = restRequest.getActionFromRestUrl();
-        Assert.assertEquals(errorMessage, expectedAction, resultAction);
-    }
-
-    @Test
     public void getGetContactActionFromValidRestUriTest() throws Exception {
         final String pathInfo = "/get_contact/1";
         final RestRequest restRequest = new RestRequest(pathInfo);

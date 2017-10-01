@@ -6,7 +6,7 @@
 <c:url value="/api/get_contacts?offset=0&count=20" var="getContactsUrl" />
 <c:url value="/api/update_contact" var="updateContactUrl" />
 <c:url value="/api/" var="var2" />
-<c:url value="/api/create_contact?contact_submit=" var="createContactUrl"/>
+<c:url value="/api/create_contact?submit=true" var="createContactUrl"/>
 
 <html lang="en">
 <head>
@@ -35,7 +35,16 @@
             <div class="alert alert-success">
                 Don't forger to save changes!
             </div>
-            <button type="button" class="btn btn-lg btn-success" onclick="updateContact()">
+            <button type="button" class="btn btn-lg btn-success" id="save-button"
+                    <c:choose>
+                        <c:when test="${not empty contact}">
+                            onclick="updateContact()"
+                        </c:when>
+                        <c:otherwise>
+                            onclick="createContact()"
+                        </c:otherwise>
+                    </c:choose>
+            >
                 <i class="fa fa-cloud fa-lg" aria-hidden="true"></i> Save
             </button>
         </div>
@@ -85,7 +94,7 @@
             </div>
 
             <div class="form-group">
-                <label for="birthday">Date: </label>
+                <label for="birthday">Birthday: </label>
                 <input class="form-control" type="date" id="birthday" name="birthday"
                 <c:choose>
                 <c:when test="${not empty contact}">
@@ -284,7 +293,7 @@
                     <i class="fa fa-pencil fa-lg" aria-hidden="true"></i> Edit
                 </a>
                 <a href="#" class="btn btn-success btn-sm control-button" role="button"
-                   onclick="showPhoneModal()">
+                   onclick="showPhoneModal(addPhone)">
                     <i class="fa fa-plus" aria-hidden="true"></i> Add
                 </a>
 
@@ -307,10 +316,10 @@
                             <td>${phone.comment}</td>
                             <td class="col-xs-2">
                                 <div class="btn-group">
-                                    <button class="btn btn-sm btn-danger" onclick="deletePhone(this)">
+                                    <button class="btn btn-xs btn-danger" onclick="deletePhone(this)">
                                         <i class="fa fa-trash-o fa-lg"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-warning" onclick="showPhoneModal(editPhone, this)">
+                                    <button class="btn btn-xs btn-warning" onclick="showPhoneModal(editPhone, this)">
                                         <i class="fa fa-pencil fa-lg"></i>
                                     </button>
                                 </div>
@@ -349,7 +358,7 @@
             </div>
             <div class="modal-footer">
                 <h3>Modal Footer</h3>
-                <button type="button" class="btn btn-success btn-md" id="attachment-ok-button" onclick="">OK</button>
+                <button type="button" class="btn btn-success btn-md" id="attachment-ok-button" onclick="addAttachment()">OK</button>
                 <button type="button" class="btn btn-danger btn-md" onclick="cancelAttachment()">Cancel</button>
             </div>
         </div>
@@ -366,17 +375,17 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label for="country-code">Country code: </label>
-                    <input type="text" class="form-control" id="country-code" name="country-code">
+                    <input type="text" class="form-control" id="country-code" name="country-code" placeholder="+375">
                 </div>
 
                 <div class="form-group">
                     <label for="operator-code">Operator code: </label>
-                    <input type="text" class="form-control" id="operator-code" name="operator-code">
+                    <input type="text" class="form-control" id="operator-code" name="operator-code" placeholder="29">
                 </div>
 
                 <div class="form-group">
                     <label for="phone-number">Phone number: </label>
-                    <input type="text" class="form-control" id="phone-number" name="phone-number">
+                    <input type="text" class="form-control" id="phone-number" name="phone-number" placeholder="2326718">
                 </div>
 
                 <div class="form-group">
@@ -390,12 +399,11 @@
 
                 <div class="form-group">
                     <label for="phone-comment">Comment: </label>
-                    <input type="text" class="form-control" id="phone-comment" name="phone-comment">
-                </div>
+                    <input type="text" class="form-control" id="phone-comment" name="phone-comment" placeholder="comment">
             </div>
             <div class="modal-footer">
                 <h3>Modal Footer</h3>
-                <button type="button" class="btn btn-success btn-md" id="phone-ok-button" onclick="addPhone()">Ok</button>
+                <button type="button" class="btn btn-success btn-md" id="phone-ok-button">OK</button>
                 <button type="button" class="btn btn-danger btn-md" onclick="cancelPhone()">Cancel</button>
             </div>
         </div>

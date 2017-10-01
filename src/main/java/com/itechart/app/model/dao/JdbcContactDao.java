@@ -322,7 +322,10 @@ public class JdbcContactDao implements ContactDao {
         int rowsUpdated = 0;
         int companyId = getContactCompanyId(contact);
         int nationalityId = getContactNationalityId(contact);
-        rowsUpdated += updateContactPhoto(contact);
+
+        if(contact.getPhoto().getPhotoStream() != null) {
+            rowsUpdated += updateContactPhoto(contact);
+        }
 
         PreparedStatement updateContactInfoStmt = null;
 
@@ -556,7 +559,7 @@ public class JdbcContactDao implements ContactDao {
 
         try {
             final String getContactAttachmentsSqlQuery =
-                    "SELECT id_attachment, name, download_date, commentary, attachment\n" +
+                    "SELECT id_attachment, id_contact, name, download_date, commentary, attachment\n" +
                     "FROM attachments WHERE id_contact = ?";
 
             getContactAttachmentsStmt = connection.prepareStatement(getContactAttachmentsSqlQuery);
@@ -566,10 +569,11 @@ public class JdbcContactDao implements ContactDao {
             while (resultSet.next()) {
                 Attachment attachment = new Attachment();
                 attachment.setAttachmentId(resultSet.getInt(1));
-                attachment.setFileName(resultSet.getString(2));
-                attachment.setDownloadDate(resultSet.getDate(3).toString());
-                attachment.setComment(resultSet.getString(4));
-                attachment.setFileStream(resultSet.getBinaryStream(5));
+                attachment.setContactId(resultSet.getInt(2));
+                attachment.setFileName(resultSet.getString(3));
+                attachment.setDownloadDate(resultSet.getDate(4).toString());
+                attachment.setComment(resultSet.getString(5));
+                attachment.setFileStream(resultSet.getBinaryStream(6));
 
                 attachments.add(attachment);
             }
@@ -585,7 +589,7 @@ public class JdbcContactDao implements ContactDao {
 
         try {
             final String getContactPhonesSqlQuery =
-                    "SELECT id_phone, phone_number, commentary, phone_type \n" +
+                    "SELECT id_phone, id_contact, phone_number, commentary, phone_type \n" +
                     "FROM phones \n" +
                     "WHERE id_contact = ?";
 
@@ -596,9 +600,10 @@ public class JdbcContactDao implements ContactDao {
             while (resultSet.next()) {
                 Phone phone = new Phone();
                 phone.setPhoneId(resultSet.getInt(1));
-                phone.setPhoneNumber(resultSet.getString(2));
-                phone.setComment(resultSet.getString(3));
-                phone.setPhoneType(resultSet.getString(4));
+                phone.setContactId(resultSet.getInt(2));
+                phone.setPhoneNumber(resultSet.getString(3));
+                phone.setComment(resultSet.getString(4));
+                phone.setPhoneType(resultSet.getString(5));
 
                 phones.add(phone);
             }
@@ -741,12 +746,49 @@ public class JdbcContactDao implements ContactDao {
     public int updateAttachmentFromContact(final int attachmentId, final Attachment attachment)
             throws ContactDaoException {
         int rowsUpdated;
+        if(attachment.getFileStream() == null){
+            rowsUpdated = updateOnlyAttachmentFields(attachmentId, attachment);
+        } else {
+            rowsUpdated = updateFullAttachment(attachmentId, attachment);
+        }
+        return rowsUpdated;
+    }
+
+    private int updateOnlyAttachmentFields(final int attachmentId, final Attachment attachment)
+            throws ContactDaoException{
+        int rowsUpdated;
         PreparedStatement updateAttachmentFromContactStmt = null;
 
         final String updateAttachmentFromContactSqlQuery =
                 "UPDATE attachments \n" +
-                "SET name = ?, download_date = ?, commentary = ?, attachment = ? \n" +
+                "SET name = ?, commentary = ? \n" +
                 "WHERE id_attachment = ?";
+        try {
+            updateAttachmentFromContactStmt = connection.prepareStatement(updateAttachmentFromContactSqlQuery);
+
+            updateAttachmentFromContactStmt.setString(1, attachment.getFileName());
+            updateAttachmentFromContactStmt.setString(2, attachment.getComment());
+            updateAttachmentFromContactStmt.setInt(3, attachmentId);
+
+            rowsUpdated = updateAttachmentFromContactStmt.executeUpdate();
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
+        } finally {
+            closeStatement(updateAttachmentFromContactStmt);
+        }
+        return rowsUpdated;
+    }
+
+    private int updateFullAttachment(final int attachmentId, final Attachment attachment)
+            throws ContactDaoException{
+        int rowsUpdated;
+        PreparedStatement updateAttachmentFromContactStmt = null;
+
+        final String updateAttachmentFromContactSqlQuery =
+                "UPDATE attachments \n" +
+                        "SET name = ?, download_date = ?, commentary = ?, attachment = ? \n" +
+                        "WHERE id_attachment = ?";
         try {
             updateAttachmentFromContactStmt = connection.prepareStatement(updateAttachmentFromContactSqlQuery);
 

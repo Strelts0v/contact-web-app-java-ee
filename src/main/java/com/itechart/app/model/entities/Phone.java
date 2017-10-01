@@ -8,6 +8,8 @@ public class Phone {
 
     private int phoneId;
 
+    private int contactId;
+
     private String phoneNumber;
 
     private String phoneType;
@@ -26,6 +28,14 @@ public class Phone {
 
     public void setPhoneId(int phoneId) {
         this.phoneId = phoneId;
+    }
+
+    public int getContactId() {
+        return contactId;
+    }
+
+    public void setContactId(int contactId) {
+        this.contactId = contactId;
     }
 
     public String getPhoneNumber() {
@@ -62,6 +72,7 @@ public class Phone {
 
         return new EqualsBuilder()
                 .append(phoneId, phone.phoneId)
+                .append(contactId, phone.contactId)
                 .append(phoneNumber, phone.phoneNumber)
                 .append(phoneType, phone.phoneType)
                 .append(comment, phone.comment)
@@ -72,6 +83,7 @@ public class Phone {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(phoneId)
+                .append(contactId)
                 .append(phoneNumber)
                 .append(phoneType)
                 .append(comment)
@@ -82,6 +94,7 @@ public class Phone {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("phoneId", phoneId)
+                .append("contactId", contactId)
                 .append("phoneNumber", phoneNumber)
                 .append("phoneType", phoneType)
                 .append("comment", comment)
