@@ -120,6 +120,14 @@ public interface ContactDao {
     int deletePhoneFromContact(final int phoneId) throws ContactDaoException;
 
     /**
+     * gets email address from database according contactIds
+     * @param contactIds - ids of contacts
+     * @return List of email addresses
+     * @throws ContactDaoException - if there is error during performing method
+     */
+    List<String> getEmailsByIds(final int[] contactIds) throws ContactDaoException;
+
+    /**
      * perform actions to close dao object
      * @param wasDaoActionsSuccessful - indicated was any mistake in dao actions
      * @throws ContactDaoException - if there is error during performing method
