@@ -902,6 +902,34 @@ public class JdbcContactDao implements ContactDao {
         return rowsDeleted;
     }
 
+    @Override
+    public List<String> getEmailsByIds(int[] contactIds) throws ContactDaoException {
+        List<String> emailList = new ArrayList<>();
+
+        final String getEmailByIdSqlQuery =
+                "SELECT email FROM contacts WHERE id_contact = ?";
+
+        for(int contactId : contactIds){
+            PreparedStatement getEmailByIdStmt = null;
+            try {
+                getEmailByIdStmt = connection.prepareStatement(getEmailByIdSqlQuery);
+                getEmailByIdStmt.setInt(1, contactId);
+
+                ResultSet resultSet = getEmailByIdStmt.executeQuery();
+                if(resultSet.next()){
+                    String email = resultSet.getString(1);
+                    emailList.add(email);
+                }
+            } catch (SQLException sqle){
+                AppLogger.error(sqle.getMessage());
+                throw new ContactDaoException(sqle);
+            } finally {
+                closeStatement(getEmailByIdStmt);
+            }
+        }
+        return emailList;
+    }
+
     /**
      * As JdbcContactDao instance uses connection from connection pool
      * @see DatabaseConnectionManager, it is important to release
