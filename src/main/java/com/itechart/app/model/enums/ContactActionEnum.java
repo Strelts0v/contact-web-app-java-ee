@@ -34,11 +34,6 @@ public enum ContactActionEnum {
             action = new SearchContactAction();
         }
     },
-    ADD_ATTACHMENT_TO_CONTACT{
-        {
-            action = new AddAttachmentToContactAction();
-        }
-    },
     SEND_EMAIL_TO_CONTACTS{
         {
             action = new SendEmailToContactsAction();
