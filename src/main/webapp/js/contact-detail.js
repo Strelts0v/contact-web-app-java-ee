@@ -41,12 +41,17 @@ function parsePhone(tr){
 }
 
 function parsePhoneId(tr){
-    var inputWithId = tr
-        .children[PHONE_ID_TD_INDEX]
-        .children[0];                   // input child
+    var phoneId;
+    try {
+        var inputWithId = tr
+            .children[PHONE_ID_TD_INDEX]
+            .children[0];                   // input child
 
-    return inputWithId.value;
-
+        phoneId = inputWithId.value;
+    } catch (err){
+        phoneId = 0;
+    }
+    return phoneId;
 }
 
 function parsePhoneNumber(tr){
@@ -376,19 +381,39 @@ function editCheckedAttachments(checkBoxName){
     // loop over them all and edit checked attachments
     var editButtonTdIndex = 4;
     var editButtonIndex = 1;
+    var checkedCheckBoxes = [];
     for(var i = 0; i < checkBoxes.length; i++){
         if(checkBoxes[i].checked){
-            var tr = checkBoxes[i]
-                .parentElement  // get td
-                .parentElement; // get tr
-            var editButtonTd = tr.children[editButtonTdIndex];
-            var editButton = editButtonTd
-                .children[0]                    // get btn-group div with control buttons
-                .children[editButtonIndex];     // get edit button
-            // show attachment modal and send editAttachment() function with edit button element
-            showAttachmentModal(editAttachment, editButton);
+            checkedCheckBoxes.push(checkBoxes[i])
         }
     }
+    if(checkedCheckBoxes.length <= 0 || checkedCheckBoxes.length > 1){
+        setTooManyAttachmentsCheckedWarning();
+        return;
+    }
+    disableTooManyAttachmentsCheckedWarning();
+
+    var tr = checkBoxes[0]
+        .parentElement  // get td
+        .parentElement; // get tr
+    var editButtonTd = tr.children[editButtonTdIndex];
+    var editButton = editButtonTd
+        .children[0]                    // get btn-group div with control buttons
+        .children[editButtonIndex];     // get edit button
+    // show attachment modal and send editAttachment() function with edit button element
+    showAttachmentModal(editAttachment, editButton);
+}
+
+const ATTACHMENT_WARNING_DIV_ID = "attachments-warning";
+
+function setTooManyAttachmentsCheckedWarning(){
+    var attachmentWarningDiv = document.getElementById(ATTACHMENT_WARNING_DIV_ID)
+    attachmentWarningDiv.className = "";
+}
+
+function disableTooManyAttachmentsCheckedWarning(){
+    var attachmentWarningDiv = document.getElementById(ATTACHMENT_WARNING_DIV_ID)
+    attachmentWarningDiv.className = "hidden";
 }
 
 function downloadAttachment(buttonClicked){
@@ -585,7 +610,6 @@ function editPhone(){
     const MODAL_PHONE_TYPE_ID = "phone-type";
     const MODAL_PHONE_COMMENT_ID = "phone-comment";
 
-
     var newPhoneNumber =
         document.getElementById(MODAL_COUNTRY_CODE_ID).value +
         document.getElementById(MODAL_OPERATOR_CODE_ID).value +
@@ -622,6 +646,70 @@ function parsePhoneNumberFromFullPhoneNumber(fullPhoneNumber){
     const phoneNumberBeginIndex = 6;
     const phoneNumberEndIndex = fullPhoneNumber.length;
     return fullPhoneNumber.substring(phoneNumberBeginIndex, phoneNumberEndIndex);
+}
+
+function deleteCheckedPhones(checkBoxName){
+    // first find all checked attachments from table
+    var checkBoxes = document.getElementsByName(checkBoxName);
+    // loop over them all and delete checked attachments using delete button on attachment
+    var deleteButtonTdIndex = 4;
+    var deleteButtonIndex = 0;
+    for(var i = 0; i < checkBoxes.length; i++){
+        if(checkBoxes[i].checked){
+            var tr = checkBoxes[i]
+                .parentElement  // get td
+                .parentElement; // get tr
+            var deleteButtonTd = tr.children[deleteButtonTdIndex];
+            var deleteButton = deleteButtonTd
+                .children[0]                    // get btn-group div with control buttons
+                .children[deleteButtonIndex];   // get delete button
+            // delete attachment using onclick function (deleteButton(buttonClickedElement);
+            deletePhone(deleteButton);
+            i--;
+        }
+    }
+}
+
+function editCheckedPhones(checkBoxName){
+    // first find all checked attachments from table
+    var checkBoxes = document.getElementsByName(checkBoxName);
+    // loop over them all and edit checked attachments
+    var editButtonTdIndex = 4;
+    var editButtonIndex = 1;
+    var checkedCheckBoxes = [];
+    for(var i = 0; i < checkBoxes.length; i++){
+        if(checkBoxes[i].checked){
+            checkedCheckBoxes.push(checkBoxes[i]);
+        }
+    }
+
+    if(checkedCheckBoxes.length <= 0 || checkedCheckBoxes.length > 1){
+        setTooManyPhonesCheckedWarning();
+        return;
+    }
+    disableTooManyPhonesCheckedWarning();
+
+    var tr = checkBoxes[0]
+        .parentElement  // get td
+        .parentElement; // get tr
+    var editButtonTd = tr.children[editButtonTdIndex];
+    var editButton = editButtonTd
+        .children[0]                    // get btn-group div with control buttons
+        .children[editButtonIndex];     // get edit button
+    // show attachment modal and send editAttachment() function with edit button element
+    showPhoneModal(editPhone, editButton);
+}
+
+const PHONE_WARNING_DIV_ID = "phones-warning";
+
+function setTooManyPhonesCheckedWarning(){
+    var attachmentWarningDiv = document.getElementById(PHONE_WARNING_DIV_ID)
+    attachmentWarningDiv.className = "";
+}
+
+function disableTooManyPhonesCheckedWarning(){
+    var attachmentWarningDiv = document.getElementById(PHONE_WARNING_DIV_ID)
+    attachmentWarningDiv.className = "hidden";
 }
 
 //////////////////////////////////////////
@@ -668,49 +756,6 @@ function cancelPhoto(){
     closePhotoModal();
 }
 
-function deleteCheckedPhones(checkBoxName){
-    // first find all checked attachments from table
-    var checkBoxes = document.getElementsByName(checkBoxName);
-    // loop over them all and delete checked attachments using delete button on attachment
-    var deleteButtonTdIndex = 4;
-    var deleteButtonIndex = 0;
-    for(var i = 0; i < checkBoxes.length; i++){
-        if(checkBoxes[i].checked){
-            var tr = checkBoxes[i]
-                .parentElement  // get td
-                .parentElement; // get tr
-            var deleteButtonTd = tr.children[deleteButtonTdIndex];
-            var deleteButton = deleteButtonTd
-                .children[0]                    // get btn-group div with control buttons
-                .children[deleteButtonIndex];   // get delete button
-            // delete attachment using onclick function (deleteButton(buttonClickedElement);
-            deletePhone(deleteButton);
-            i--;
-        }
-    }
-}
-
-function editCheckedPhones(checkBoxName){
-    // first find all checked attachments from table
-    var checkBoxes = document.getElementsByName(checkBoxName);
-    // loop over them all and edit checked attachments
-    var editButtonTdIndex = 4;
-    var editButtonIndex = 1;
-    for(var i = 0; i < checkBoxes.length; i++){
-        if(checkBoxes[i].checked){
-            var tr = checkBoxes[i]
-                .parentElement  // get td
-                .parentElement; // get tr
-            var editButtonTd = tr.children[editButtonTdIndex];
-            var editButton = editButtonTd
-                .children[0]                    // get btn-group div with control buttons
-                .children[editButtonIndex];     // get edit button
-            // show attachment modal and send editAttachment() function with edit button element
-            showPhoneModal(editPhone, editButton);
-        }
-    }
-}
-
 function createContact(){
     // contact info properties
     const surname = document.getElementById(SURNAME_INPUT_ID).value;
@@ -727,6 +772,14 @@ function createContact(){
     const city = document.getElementById(CITY_INPUT_ID).value;
     const address = document.getElementById(ADDRESS_INPUT_ID).value;
     const index = document.getElementById(INDEX_INPUT_ID).value;
+
+    if(checkParamsValidity(email, surname, firstName, patronymic, gender, nationality,
+            marital_status, company, country, city,
+            address, index) === false){
+        setInvalidParamsErrorMessage();
+        return;
+    }
+    disableInvalidParamsErrorMessage();
 
     formData.append(SURNAME_INPUT_ID, surname);
     formData.append(FIRSTNAME_INPUT_ID, firstName);
@@ -746,7 +799,7 @@ function createContact(){
     var phoneTableRows = document.getElementsByClassName(PHONE_CLASS_NAME);
     var phones = [];
     for(var i = 0; i < phoneTableRows.length; i++){
-        phones[i] = parsePhone(phoneTableRows[i].innerText, phoneTableRows[i].cells[0].innerHTML)
+        phones[i] = parsePhone(phoneTableRows[i], phoneTableRows[i].cells[0].innerHTML)
     }
     var phonesJson = JSON.stringify(phones);
     formData.append(PHONES_PARAM_NAME, phonesJson);
@@ -772,9 +825,9 @@ function createContact(){
     var xhr = new XMLHttpRequest();
     xhr.open("post", "/api/create_contact?submit=true", false);
     xhr.send(formData);
-    location.reload();
-
     formData = new FormData();
+
+    window.location.href="/api/get_contacts?page=1";
 }
 
 function updateContact(){
@@ -794,6 +847,14 @@ function updateContact(){
     const city = document.getElementById(CITY_INPUT_ID).value;
     const address = document.getElementById(ADDRESS_INPUT_ID).value;
     const index = document.getElementById(INDEX_INPUT_ID).value;
+
+    if(checkParamsValidity(email, surname, firstName, patronymic, gender, nationality,
+            marital_status, company, country, city,
+            address, index) === false){
+        setInvalidParamsErrorMessage();
+        return;
+    }
+    disableInvalidParamsErrorMessage();
 
     formData.append(ID_CONTACT_INPUT_ID, contactId);
     formData.append(SURNAME_INPUT_ID, surname);
@@ -843,4 +904,52 @@ function updateContact(){
     location.reload();
 
     formData = new FormData();
+}
+
+function checkParamsValidity(email){
+    // first param is email address
+    if(checkEmailField(arguments[0]) === false){
+        return false;
+    }
+    for(var i = 1; i < arguments.length; i++){
+        if(checkDefaultField(arguments[i]) === false){
+            return false;
+        }
+    }
+    return true;
+}
+
+function checkDefaultField(fieldValue){
+    var isFieldValid = true;
+    if(fieldValue == null){
+        isFieldValid = false;
+    }
+    else if(fieldValue.localeCompare("") === 0){
+        isFieldValid = false;
+    }
+    return isFieldValid;
+}
+
+function checkEmailField(emailValue){
+    var isEmailFieldValid = true;
+    if(emailValue == null){
+        isEmailFieldValid = false;
+    } else if(emailValue.localeCompare("") === 0){
+        isEmailFieldValid = false;
+    } else if(emailValue.indexOf("@") === -1){
+        isEmailFieldValid = false;
+    }
+    return isEmailFieldValid;
+}
+
+const ERROR_BOX_ID = "error-alert-box";
+
+function setInvalidParamsErrorMessage(){
+    var errorBoxDiv = document.getElementById(ERROR_BOX_ID)
+    errorBoxDiv.className = "";
+}
+
+function disableInvalidParamsErrorMessage(){
+    var errorBoxDiv = document.getElementById(ERROR_BOX_ID)
+    errorBoxDiv.className = "hidden";
 }

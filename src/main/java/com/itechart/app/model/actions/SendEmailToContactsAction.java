@@ -27,10 +27,12 @@ public class SendEmailToContactsAction implements ContactAction{
         if(!isSubmit){
             String initialEmailsIdsToSend = requestContent.getParameter(
                     ContactActionProperties.EMAIL_INITIAL_EMAILS_TO_SEND_PARAM);
-            if(!initialEmailsIdsToSend.equals("")){
-                List<String> emailsToSend = getEmailsByIds(initialEmailsIdsToSend);
-                requestContent.insertAttribute(ContactActionProperties
-                        .EMAIL_INITIAL_EMAIL_TO_SEND_REQUEST_ATTRIBUTE, emailsToSend);
+            if(initialEmailsIdsToSend != null) {
+                if (!initialEmailsIdsToSend.equals("")) {
+                    List<String> emailsToSend = getEmailsByIds(initialEmailsIdsToSend);
+                    requestContent.insertAttribute(ContactActionProperties
+                            .EMAIL_INITIAL_EMAIL_TO_SEND_REQUEST_ATTRIBUTE, emailsToSend);
+                }
             }
             page = PageConfigurationManager.getPageName(
                     ContactActionProperties.EMAIL_PAGE_NAME);

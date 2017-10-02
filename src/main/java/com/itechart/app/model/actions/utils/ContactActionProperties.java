@@ -23,7 +23,6 @@ public class ContactActionProperties {
     public final static int INITIAL_CONTACT_COUNT = 20;
     public final static String CONTACT_SUBMIT_PARAM = "submit";
 
-
     // Update and create contact actions properties
     public final static String FILE_ITEMS_ATTRIBUTE = "fileItems";
     public final static String PHONES_PARAM = "phones";
@@ -61,4 +60,18 @@ public class ContactActionProperties {
     // Get contact action properties
     public static final String CONTACT_ATTRIBUTE_ID = "contactId";
     public static final String CONTACT_ATTRIBUTE_NAME = "contact";
+
+    // Search contact action properties
+    public static final String SEARCH_FIRST_NAME_PARAM = "firstname";
+    public static final String SEARCH_SURNAME_PARAM = "surname";
+    public static final String SEARCH_PATRONYMIC_PARAM = "patronymic";
+    public static final String SEARCH_BIRTHDAY_FROM_PARAM = "birthday-from";
+    public static final String SEARCH_BIRTHDAY_TO_PARAM = "birthday-to";
+    public static final String SEARCH_GENDER_PARAM = "gender";
+    public static final String SEARCH_NATIONALITY_PARAM = "nationality";
+    public static final String SEARCH_MARITAL_STATUS_PARAM = "marital-status";
+    public static final String SEARCH_COUNTRY_PARAM = "country";
+    public static final String SEARCH_CITY_PARAM = "city";
+    public static final String SEARCH_ADDRESS_PARAM = "address";
+    public static final String SEARCH_INDEX_PARAM = "index";
 }

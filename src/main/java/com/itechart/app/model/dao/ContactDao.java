@@ -3,6 +3,7 @@ package com.itechart.app.model.dao;
 import com.itechart.app.model.entities.Attachment;
 import com.itechart.app.model.entities.Contact;
 import com.itechart.app.model.entities.Phone;
+import com.itechart.app.model.entities.SearchContactDetails;
 import com.itechart.app.model.exceptions.ContactDaoException;
 
 import java.util.List;
@@ -126,6 +127,14 @@ public interface ContactDao {
      * @throws ContactDaoException - if there is error during performing method
      */
     List<String> getEmailsByIds(final int[] contactIds) throws ContactDaoException;
+
+    /**
+     * searches contacts according data stored in @param searchDetails
+     * @param searchDetails - stores data that will be used to find contacts
+     * @return List of Contact objects
+     * @throws ContactDaoException - if there is error during performing method
+     */
+    List<Contact> findContacts(SearchContactDetails searchDetails) throws ContactDaoException;
 
     /**
      * perform actions to close dao object
