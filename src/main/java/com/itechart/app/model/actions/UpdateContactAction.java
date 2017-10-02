@@ -90,7 +90,7 @@ public class UpdateContactAction implements ContactAction{
                         ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
 
                 dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
-
+                AppLogger.info("Updating of contact with id=" + getContactId() + " was successful");
                 page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_DETAIL_PAGE_NAME);
             }
         }catch (ContactDaoException cde){
@@ -104,6 +104,7 @@ public class UpdateContactAction implements ContactAction{
             }
             page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
         }
+        AppLogger.info("Return " + page + " to client");
         return page;
     }
 
