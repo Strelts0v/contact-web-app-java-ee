@@ -185,7 +185,6 @@ public class JdbcContactDao implements ContactDao {
             findExistedIdStmt.setString(1, searchValue);
 
             ResultSet resultSet = findExistedIdStmt.executeQuery();
-            findExistedIdStmt.close();
             if (resultSet.next()) {
                 id = resultSet.getInt(idName);
             } else {
@@ -664,8 +663,9 @@ public class JdbcContactDao implements ContactDao {
             }
         } catch (SQLException sqle){
             AppLogger.error(sqle.getMessage());
-            closeStatement(getContactsStmt);
             throw new ContactDaoException(sqle);
+        } finally {
+            closeStatement(getContactsStmt);
         }
         return contacts;
     }
@@ -686,8 +686,9 @@ public class JdbcContactDao implements ContactDao {
             }
         } catch (SQLException sqle){
             AppLogger.error(sqle.getMessage());
-            closeStatement(getContactCountStmt);
             throw new ContactDaoException(sqle);
+        } finally {
+            closeStatement(getContactCountStmt);
         }
         return contactCount;
     }
@@ -980,7 +981,6 @@ public class JdbcContactDao implements ContactDao {
                 Contact contact = mapParamFromResultSetToContact(resultSet);
                 contactList.add(contact);
             }
-
         } catch (SQLException sqle){
             AppLogger.error(sqle.getMessage());
             throw new ContactDaoException(sqle);
@@ -1005,6 +1005,37 @@ public class JdbcContactDao implements ContactDao {
         contact.setBirthday(resultSet.getString(10));
 
         return contact;
+    }
+
+    @Override
+    public List<Contact> getContactsByBirthday(java.util.Date today) throws ContactDaoException {
+        List<Contact> contactList;
+        final String getContactsByBirthdaySqlQuery =
+                "SELECT first_name, surname, email \n" +
+                "FROM contacts \n" +
+                "WHERE DATE_FORMAT(birthday, '%m-%d') = DATE_FORMAT(?, '%m-%d')";
+
+        PreparedStatement getContactsByBirthdayStmt = null;
+        try{
+            getContactsByBirthdayStmt = connection.prepareStatement(getContactsByBirthdaySqlQuery);
+            getContactsByBirthdayStmt.setDate(1, new java.sql.Date(today.getTime()));
+
+            ResultSet resultSet = getContactsByBirthdayStmt.executeQuery();
+            contactList = new ArrayList<>();
+            while(resultSet.next()){
+                Contact contact = new Contact();
+                contact.setFirstName(resultSet.getString(1));
+                contact.setSurname(resultSet.getString(2));
+                contact.setEmail(resultSet.getString(3));
+                contactList.add(contact);
+            }
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
+        } finally {
+            closeStatement(getContactsByBirthdayStmt);
+        }
+        return contactList;
     }
 
     /**
