@@ -17,7 +17,7 @@ public class DatabaseConnectionManager {
 
     private ComboPooledDataSource dataSource;
 
-    private static DatabaseConnectionManager INSTANCE;
+    private volatile static DatabaseConnectionManager INSTANCE;
 
     /** object for extracting names of pages from resource bundle pages.properties */
     private static final ResourceBundle databaseConfigBundle
@@ -64,13 +64,16 @@ public class DatabaseConnectionManager {
     public static DatabaseConnectionManager getInstance() {
         try {
             if (INSTANCE == null) {
-                INSTANCE = new DatabaseConnectionManager();
+                synchronized (DatabaseConnectionManager.class){
+                    if (INSTANCE == null) {
+                        INSTANCE = new DatabaseConnectionManager();
+                    }
+                }
             }
         }catch (PropertyVetoException e){
             AppLogger.error(e.getMessage());
-        } finally {
-            return INSTANCE;
         }
+        return INSTANCE;
     }
 
     public Connection getConnection() throws SQLException {

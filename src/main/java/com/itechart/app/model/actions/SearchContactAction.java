@@ -35,6 +35,7 @@ public class SearchContactAction implements ContactAction{
                 page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_LIST_PAGE_NAME);
 
                 dao.closeDao();
+                AppLogger.info("After searching for contacts was found " + contacts.size() + " contacts");
             } catch (ContactDaoException cde){
                 AppLogger.error(cde.getMessage());
                 try {
@@ -47,6 +48,7 @@ public class SearchContactAction implements ContactAction{
                 page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
             }
         }
+        AppLogger.info("Return " + page + " to client");
         return page;
     }
 }

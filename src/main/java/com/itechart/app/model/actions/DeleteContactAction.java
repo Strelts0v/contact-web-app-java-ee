@@ -29,6 +29,7 @@ public class DeleteContactAction implements ContactAction{
                 dao.initializeDao();
                 for (int i = 0; i < contactIds.length; i++) {
                     dao.deleteContact(contactIds[i]);
+                    AppLogger.info("Deleting of contact with id=" + contactIds[i] + " was successful.");
                 }
                 // after deleting return page with contacts without deleted ones
                 List<Contact> contactList = dao.getContacts(ContactActionProperties.INITIAL_CONTACT_OFFSET,
@@ -38,6 +39,7 @@ public class DeleteContactAction implements ContactAction{
                 page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_LIST_PAGE_NAME);
                 dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
             }
+
         } catch (ContactDaoException cde){
             AppLogger.error(cde.getMessage());
             if(dao != null) {
@@ -49,6 +51,7 @@ public class DeleteContactAction implements ContactAction{
             }
             page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
         }
+        AppLogger.info("Return " + page + " to client");
         return page;
     }
 

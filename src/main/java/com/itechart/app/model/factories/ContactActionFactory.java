@@ -10,7 +10,8 @@ public class ContactActionFactory {
         ContactActionEnum contactActionEnum;
         try{
             contactActionEnum = ContactActionEnum.valueOf(actionFromRestUrl.toUpperCase());
-            AppLogger.info("ContactAction instance is successfully returned from ContactActionFactory");
+            AppLogger.info(contactActionEnum.getCurrentContactAction().getClass() +
+                    " instance is successfully returned from ContactActionFactory");
         } catch (IllegalArgumentException e) {
             contactActionEnum = ContactActionEnum.ERROR;
         }

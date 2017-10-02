@@ -137,6 +137,15 @@ public interface ContactDao {
     List<Contact> findContacts(SearchContactDetails searchDetails) throws ContactDaoException;
 
     /**
+     * gets contacts who has birthday according @param today
+     * @param today - date of current day used to find contacts
+     *              with birthdays on that day
+     * @return List of contact objects
+     * @throws ContactDaoException - if there is error during performing method
+     */
+    List<Contact> getContactsByBirthday(java.util.Date today) throws ContactDaoException;
+
+    /**
      * perform actions to close dao object
      * @param wasDaoActionsSuccessful - indicated was any mistake in dao actions
      * @throws ContactDaoException - if there is error during performing method

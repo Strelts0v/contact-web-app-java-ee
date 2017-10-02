@@ -16,8 +16,9 @@ public class GetContactAction implements ContactAction{
 
         final int contactId = (int) requestContent.getAttribute(ContactActionProperties.CONTACT_ATTRIBUTE_ID);
 
+        ContactDao dao = null;
         try {
-            ContactDao dao = JdbcContactDao.newInstance();
+            dao = JdbcContactDao.newInstance();
             if (dao == null) {
                 page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
             } else {
@@ -26,11 +27,20 @@ public class GetContactAction implements ContactAction{
 
                 page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_DETAIL_PAGE_NAME);
                 dao.closeDao();
+                AppLogger.info("Getting of contact with id=" + contact + " was successful");
             }
         } catch (ContactDaoException cde){
             AppLogger.error(cde.getMessage());
+            try {
+                if(dao != null) {
+                    dao.closeDao();
+                }
+            } catch (ContactDaoException cdex){
+                AppLogger.error(cde.getMessage());
+            }
             page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
         }
+        AppLogger.info("Return " + page + " to client");
         return page;
     }
 }
