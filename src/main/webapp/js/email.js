@@ -3,6 +3,12 @@ function addEmailToSendList(){
     var emailToInput = document.getElementById(EMAIL_TO_SEND_INPUT_ID);
     var emailAddress = emailToInput.value;
 
+    if(checkEmailField(emailAddress) === false){
+        setInvalidEmailMessage();
+        return;
+    }
+    disableInvalidEmailMessage();
+
     const EMAIL_TO_SEND_TABLE_BODY_ID = "table-body-emails-to-send";
     var emailTableBody = document.getElementById(EMAIL_TO_SEND_TABLE_BODY_ID);
 
@@ -38,6 +44,30 @@ function addEmailToSendList(){
     emailTableBody.appendChild(tr);
 
     addEmailToForm(emailAddress);
+}
+
+function checkEmailField(emailValue){
+    var isEmailFieldValid = true;
+    if(emailValue == null){
+        isEmailFieldValid = false;
+    } else if(emailValue.localeCompare("") === 0){
+        isEmailFieldValid = false;
+    } else if(emailValue.indexOf("@") === -1){
+        isEmailFieldValid = false;
+    }
+    return isEmailFieldValid;
+}
+
+const EMAIL_ERROR_DIV_ID = "email-error-box";
+
+function setInvalidEmailMessage(){
+    var errorBoxDiv = document.getElementById(EMAIL_ERROR_DIV_ID)
+    errorBoxDiv.className = "";
+}
+
+function disableInvalidEmailMessage(){
+    var errorBoxDiv = document.getElementById(EMAIL_ERROR_DIV_ID)
+    errorBoxDiv.className = "hidden";
 }
 
 function removeEmailFromSendList(element){
