@@ -1,6 +1,7 @@
 package com.itechart.app.model.dao;
 
 import com.itechart.app.logging.AppLogger;
+import com.itechart.app.model.dao.utils.SearchTemplateEngine;
 import com.itechart.app.model.entities.*;
 import com.itechart.app.model.exceptions.ContactDaoException;
 import com.itechart.app.model.utils.DatabaseConnectionManager;
@@ -97,7 +98,7 @@ public class JdbcContactDao implements ContactDao {
         // make searching case-insensitive
         final String findExistedCompanySqlQuery =
                 "SELECT id_company FROM companies "
-                + "WHERE company COLLATE UTF8_GENERAL_CI = ?";
+                        + "WHERE company COLLATE UTF8_GENERAL_CI = ?";
 
         final String idName = "id_company";
         try {
@@ -121,7 +122,7 @@ public class JdbcContactDao implements ContactDao {
         // make searching case-insensitive
         final String findExistedNationalitySqlQuery =
                 "SELECT id_nationality FROM nationalities \n" +
-                "WHERE nationality COLLATE UTF8_GENERAL_CI = ?";
+                        "WHERE nationality COLLATE UTF8_GENERAL_CI = ?";
         final String idName = "id_nationality";
 
         try {
@@ -243,8 +244,8 @@ public class JdbcContactDao implements ContactDao {
 
         final String addContactSqlQuery =
                 "INSERT INTO contacts(first_name, surname, patronymic, birthday, \n"
-                + "website, email, country, city, address, index_number, gender, marital_status, id_nationality,\n"
-                + "id_company, id_photo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        + "website, email, country, city, address, index_number, gender, marital_status, id_nationality,\n"
+                        + "id_company, id_photo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
             addContactStmt = connection.prepareStatement(addContactSqlQuery,
@@ -476,9 +477,9 @@ public class JdbcContactDao implements ContactDao {
         try {
             final String getContactInfoSqlQuery =
                     "SELECT first_name, surname, patronymic, birthday, website, \n" +
-                    "email, country, city, address, index_number, gender, marital_status \n" +
-                    "FROM contacts \n" +
-                    "WHERE id_contact = ? \n";
+                            "email, country, city, address, index_number, gender, marital_status \n" +
+                            "FROM contacts \n" +
+                            "WHERE id_contact = ? \n";
 
             getContactInfoStmt = connection.prepareStatement(getContactInfoSqlQuery);
             getContactInfoStmt.setInt(1, contactId);
@@ -519,8 +520,8 @@ public class JdbcContactDao implements ContactDao {
     private String getContactCompany(int contactId) throws SQLException{
         final String getContactCompanySqlQuery =
                 "SELECT comp.company \n" +
-                "FROM companies comp \n" +
-                "INNER JOIN contacts c ON c.id_contact = ? AND comp.id_company = c.id_company";
+                        "FROM companies comp \n" +
+                        "INNER JOIN contacts c ON c.id_contact = ? AND comp.id_company = c.id_company";
 
         return getContactAttributeUsingForeignKey(getContactCompanySqlQuery, contactId);
     }
@@ -528,8 +529,8 @@ public class JdbcContactDao implements ContactDao {
     private String getContactNationality(int contactId) throws SQLException{
         final String getContactNationalitySqlQuery =
                 "SELECT n.nationality \n" +
-                "FROM nationalities n \n" +
-                "INNER JOIN contacts c ON c.id_contact = ? AND n.id_nationality = c.id_nationality";
+                        "FROM nationalities n \n" +
+                        "INNER JOIN contacts c ON c.id_contact = ? AND n.id_nationality = c.id_nationality";
 
         return getContactAttributeUsingForeignKey(getContactNationalitySqlQuery, contactId);
     }
@@ -560,7 +561,7 @@ public class JdbcContactDao implements ContactDao {
         try {
             final String getContactAttachmentsSqlQuery =
                     "SELECT id_attachment, id_contact, name, download_date, commentary, attachment\n" +
-                    "FROM attachments WHERE id_contact = ?";
+                            "FROM attachments WHERE id_contact = ?";
 
             getContactAttachmentsStmt = connection.prepareStatement(getContactAttachmentsSqlQuery);
             getContactAttachmentsStmt.setInt(1, contactId);
@@ -590,8 +591,8 @@ public class JdbcContactDao implements ContactDao {
         try {
             final String getContactPhonesSqlQuery =
                     "SELECT id_phone, id_contact, phone_number, commentary, phone_type \n" +
-                    "FROM phones \n" +
-                    "WHERE id_contact = ?";
+                            "FROM phones \n" +
+                            "WHERE id_contact = ?";
 
             getContactPhonesStmt = connection.prepareStatement(getContactPhonesSqlQuery);
             getContactPhonesStmt.setInt(1, contactId);
@@ -620,8 +621,8 @@ public class JdbcContactDao implements ContactDao {
         try {
             final String getContactPhotoSqlQuery =
                     "SELECT p.id_photo, p.photo \n" +
-                    "FROM photos p \n" +
-                    "INNER JOIN contacts c ON c.id_photo = p.id_photo AND c.id_contact = ?";
+                            "FROM photos p \n" +
+                            "INNER JOIN contacts c ON c.id_photo = p.id_photo AND c.id_contact = ?";
 
             getContactPhotoStmt = connection.prepareStatement(getContactPhotoSqlQuery);
             getContactPhotoStmt.setInt(1, contactId);
@@ -646,10 +647,10 @@ public class JdbcContactDao implements ContactDao {
         PreparedStatement getContactsStmt = null;
         final String getContactsSqlQuery =
                 "SELECT c.id_contact, c.first_name, c.surname, c.patronymic, \n" +
-                "c.country, c.city, c.address, c.index_number, comp.company, c.birthday \n" +
-                "FROM contacts c \n" +
-                "INNER JOIN companies comp ON c.id_company = comp.id_company \n" +
-                "LIMIT ?, ?";
+                        "c.country, c.city, c.address, c.index_number, comp.company, c.birthday \n" +
+                        "FROM contacts c \n" +
+                        "INNER JOIN companies comp ON c.id_company = comp.id_company \n" +
+                        "LIMIT ?, ?";
         try {
             getContactsStmt = connection.prepareStatement(getContactsSqlQuery);
             getContactsStmt.setInt(1, recordOffset);
@@ -658,19 +659,8 @@ public class JdbcContactDao implements ContactDao {
             ResultSet resultSet = getContactsStmt.executeQuery();
             contacts = new ArrayList<>(recordCount);
             while(resultSet.next()){
-                Contact c = new Contact();
-                c.setContactId(resultSet.getInt(1));
-                c.setFirstName(resultSet.getString(2));
-                c.setSurname(resultSet.getString(3));
-                c.setPatronymic(resultSet.getString(4));
-                c.setCountry(resultSet.getString(5));
-                c.setCity(resultSet.getString(6));
-                c.setAddress(resultSet.getString(7));
-                c.setIndexNumber(resultSet.getString(8));
-                c.setCompany(resultSet.getString(9));
-                c.setBirthday(resultSet.getString(10));
-
-                contacts.add(c);
+                Contact contact = mapParamFromResultSetToContact(resultSet);
+                contacts.add(contact);
             }
         } catch (SQLException sqle){
             AppLogger.error(sqle.getMessage());
@@ -710,8 +700,8 @@ public class JdbcContactDao implements ContactDao {
         try {
             final String addAttachmentSqlQuery =
                     "INSERT INTO attachments (id_contact, name, \n" +
-                    "download_date, commentary, attachment) VALUES \n" +
-                    "(?, ?, ?, ?, ?) ";
+                            "download_date, commentary, attachment) VALUES \n" +
+                            "(?, ?, ?, ?, ?) ";
 
             addAttachmentStmt = connection.prepareStatement(addAttachmentSqlQuery,
                     Statement.RETURN_GENERATED_KEYS);
@@ -761,8 +751,8 @@ public class JdbcContactDao implements ContactDao {
 
         final String updateAttachmentFromContactSqlQuery =
                 "UPDATE attachments \n" +
-                "SET name = ?, commentary = ? \n" +
-                "WHERE id_attachment = ?";
+                        "SET name = ?, commentary = ? \n" +
+                        "WHERE id_attachment = ?";
         try {
             updateAttachmentFromContactStmt = connection.prepareStatement(updateAttachmentFromContactSqlQuery);
 
@@ -831,8 +821,8 @@ public class JdbcContactDao implements ContactDao {
         try {
             final String addPhoneSqlQuery =
                     "INSERT INTO phones(id_contact, phone_number, \n" +
-                    "phone_type, commentary) VALUES \n" +
-                    "(?, ?, ?, ?) ";
+                            "phone_type, commentary) VALUES \n" +
+                            "(?, ?, ?, ?) ";
 
             addPhoneStmt = connection.prepareStatement(addPhoneSqlQuery,
                     Statement.RETURN_GENERATED_KEYS);
@@ -869,8 +859,8 @@ public class JdbcContactDao implements ContactDao {
 
         final String updatePhoneSqlQuery =
                 "UPDATE phones \n" +
-                "SET phone_number = ?, phone_type = ?, commentary = ? \n" +
-                "WHERE id_phone = ?";
+                        "SET phone_number = ?, phone_type = ?, commentary = ? \n" +
+                        "WHERE id_phone = ?";
         try {
             updatePhoneStmt = connection.prepareStatement(updatePhoneSqlQuery);
 
@@ -928,6 +918,93 @@ public class JdbcContactDao implements ContactDao {
             }
         }
         return emailList;
+    }
+
+    @Override
+    public List<Contact> findContacts(SearchContactDetails searchDetails) throws ContactDaoException {
+        List<Contact> contactList;
+        final int searchLimitOffset = 0;
+        final int searchLimitCount = 20;
+
+        final String findContactsSqlQuery =
+                "SELECT c.id_contact, c.first_name, c.surname, c.patronymic, \n" +
+                        "c.country, c.city, c.address, c.index_number, comp.company, c.birthday \n" +
+                        "FROM contacts c\n" +
+                        "INNER JOIN companies comp ON c.id_company = comp.id_company \n" +
+                        "WHERE c.first_name COLLATE UTF8_GENERAL_CI LIKE ? AND \n" +
+                        "    c.surname COLLATE UTF8_GENERAL_CI LIKE ? AND \n" +
+                        "    c.patronymic COLLATE UTF8_GENERAL_CI LIKE ? AND \n" +
+                        "    c.gender COLLATE UTF8_GENERAL_CI LIKE ? AND \n" +
+                        "    c.marital_status COLLATE UTF8_GENERAL_CI LIKE ? AND \n" +
+                        "    c.email COLLATE UTF8_GENERAL_CI LIKE ? AND \n" +
+                        "    c.country COLLATE UTF8_GENERAL_CI LIKE ? AND\n" +
+                        "    c.city COLLATE UTF8_GENERAL_CI LIKE ? AND \n" +
+                        "    c.address COLLATE UTF8_GENERAL_CI LIKE ? AND \n" +
+                        "    c.index_number COLLATE UTF8_GENERAL_CI LIKE ? AND \n" +
+                        "    c.`birthday` > ? AND \n" +
+                        "    c.`birthday` < ? " +
+                        "LIMIT ?, ?";
+
+
+        PreparedStatement findContactsStmt = null;
+        try{
+            findContactsStmt = connection.prepareStatement(findContactsSqlQuery);
+            findContactsStmt.setString(1,
+                    SearchTemplateEngine.generateSearchTemplate(searchDetails.getFirstName()));
+            findContactsStmt.setString(2,
+                    SearchTemplateEngine.generateSearchTemplate(searchDetails.getSurname()));
+            findContactsStmt.setString(3,
+                    SearchTemplateEngine.generateSearchTemplate(searchDetails.getPatronymic()));
+            findContactsStmt.setString(4,
+                    SearchTemplateEngine.generateSearchTemplate(searchDetails.getGender()));
+            findContactsStmt.setString(5,
+                    SearchTemplateEngine.generateSearchTemplate(searchDetails.getMaritalStatus()));
+            findContactsStmt.setString(6,
+                    SearchTemplateEngine.generateSearchTemplate(searchDetails.getEmail()));
+            findContactsStmt.setString(7,
+                    SearchTemplateEngine.generateSearchTemplate(searchDetails.getCountry()));
+            findContactsStmt.setString(8,
+                    SearchTemplateEngine.generateSearchTemplate(searchDetails.getCity()));
+            findContactsStmt.setString(9,
+                    SearchTemplateEngine.generateSearchTemplate(searchDetails.getAddress()));
+            findContactsStmt.setString(10,
+                    SearchTemplateEngine.generateSearchTemplate(searchDetails.getIndexNumber()));
+            findContactsStmt.setDate(11, java.sql.Date.valueOf(searchDetails.getBirthdayFrom()));
+            findContactsStmt.setDate(12, java.sql.Date.valueOf(searchDetails.getBirthdayTo()));
+            findContactsStmt.setInt(13, searchLimitOffset);
+            findContactsStmt.setInt(14, searchLimitCount);
+
+            ResultSet resultSet = findContactsStmt.executeQuery();
+            contactList = new ArrayList<>();
+            while(resultSet.next()){
+                Contact contact = mapParamFromResultSetToContact(resultSet);
+                contactList.add(contact);
+            }
+
+        } catch (SQLException sqle){
+            AppLogger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
+        } finally {
+            closeStatement(findContactsStmt);
+        }
+        return contactList;
+    }
+
+    private Contact mapParamFromResultSetToContact(ResultSet resultSet) throws SQLException{
+        Contact contact = new Contact();
+
+        contact.setContactId(resultSet.getInt(1));
+        contact.setFirstName(resultSet.getString(2));
+        contact.setSurname(resultSet.getString(3));
+        contact.setPatronymic(resultSet.getString(4));
+        contact.setCountry(resultSet.getString(5));
+        contact.setCity(resultSet.getString(6));
+        contact.setAddress(resultSet.getString(7));
+        contact.setIndexNumber(resultSet.getString(8));
+        contact.setCompany(resultSet.getString(9));
+        contact.setBirthday(resultSet.getString(10));
+
+        return contact;
     }
 
     /**

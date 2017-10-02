@@ -61,7 +61,11 @@
                                     <span class="input-group-addon" onclick="addEmailToSendList()">
                                         <i class="fa fa-plus" aria-hidden="true"></i>
                                      </span>
-                                    <div class="help-block with-errors"></div>
+                                </div>
+                                <div class="hidden" id="email-error-box">
+                                    <div class="alert alert-danger">
+                                        <strong>Invalid input data!</strong> check input email address...
+                                    </div>
                                 </div>
                             </div>
 
