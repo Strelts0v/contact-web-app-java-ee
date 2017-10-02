@@ -1,0 +1,33 @@
+body{
+    background-color: #E6E6E6;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 10pt;
+    padding-top: 50px;
+    text-align: left;
+}
+a {
+    color: #666;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+.container {
+    margin: auto;
+    max-width: 540px;
+    min-width: 200px;
+}
+.box hr {
+    diplay: block;
+    border: none;
+    border-bottom: 1px dashed #ccc;
+}
+.box {
+    background-color: #fbfbfb;
+    border: 1px solid #AAA;
+    border-bottom: 1px solid #888;
+    border-radius: 3px;
+    color: black;
+    box-shadow: 0px 2px 2px #AAA;
+    padding: 20px;
+}
