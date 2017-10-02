@@ -43,7 +43,8 @@ public class SendEmailToContactsAction implements ContactAction{
 
             EmailTemplateEnum emailTemplate;
             try {
-                String emailTemplateStr = requestContent.getParameter(ContactActionProperties.EMAIL_TEMPLATE_PARAM);
+                String emailTemplateStr = requestContent.getParameter(
+                        ContactActionProperties.EMAIL_TEMPLATE_PARAM);
                 emailTemplate = EmailTemplateEnum.valueOf(emailTemplateStr.toUpperCase());
             } catch (IllegalArgumentException iae){
                 AppLogger.error(iae.getMessage());
@@ -54,7 +55,6 @@ public class SendEmailToContactsAction implements ContactAction{
             }
 
             Map<String, String> emailParamsMap = emailTemplate.getEmailParamsMap(requestContent);
-
             EmailManager emailManager = new EmailManager();
             try {
                 emailManager.sendEmail(emails, emailTemplate, emailParamsMap);
@@ -71,6 +71,7 @@ public class SendEmailToContactsAction implements ContactAction{
                     ContactActionProperties.WAS_SENDING_EMAIL_SUCCESSFUL_REQUEST_ATTRIBUTE,
                     ContactActionProperties.SENDING_EMAIL_WAS_SUCCESSFUL);
         }
+        AppLogger.info("Return " + page + " to client");
         return page;
     }
 
