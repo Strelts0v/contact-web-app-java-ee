@@ -37,6 +37,7 @@ public class CreateContactAction implements ContactAction{
                 ContactActionProperties.CONTACT_SUBMIT_PARAM));
         if(!isSubmit){
             page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_DETAIL_PAGE_NAME);
+            AppLogger.info("Get contact-detail.jsp for creating new contact.");
         } else {
             // parse FileItem objects into Contact entities
             List<FileItem> items = (List<FileItem>) requestContent.getAttribute(ContactActionProperties.FILE_ITEMS_ATTRIBUTE);
@@ -81,6 +82,7 @@ public class CreateContactAction implements ContactAction{
 
                     page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_DETAIL_PAGE_NAME);
                 }
+                AppLogger.info("Creating of new contact was successful.");
             }catch (ContactDaoException cde){
                 AppLogger.error(cde.getMessage());
                 if(dao != null) {
@@ -93,6 +95,7 @@ public class CreateContactAction implements ContactAction{
                 page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
             }
         }
+        AppLogger.info("Return " + page + " to client");
         return page;
     }
 
