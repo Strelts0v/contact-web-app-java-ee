@@ -20,8 +20,9 @@ public class GetContactsAction implements ContactAction{
         final int pageIndex = Integer.parseInt(pageIndexStr);
         final int offset = (pageIndex - 1) * ContactActionProperties.DEFAULT_CONTACT_COUNT;
 
+        ContactDao dao = null;
         try {
-            ContactDao dao = JdbcContactDao.newInstance();
+            dao = JdbcContactDao.newInstance();
             if (dao == null) {
                 page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
             } else {
@@ -38,11 +39,20 @@ public class GetContactsAction implements ContactAction{
                 page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_LIST_PAGE_NAME);
                 // close connection with database
                 dao.closeDao();
+                AppLogger.info("Getting contacts according page=" + pageIndex + " was successful");
             }
         }catch (ContactDaoException cde){
             AppLogger.error(cde.getMessage());
+            try {
+                if(dao != null) {
+                    dao.closeDao();
+                }
+            } catch (ContactDaoException cdex){
+                AppLogger.error(cde.getMessage());
+            }
             page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
         }
+        AppLogger.info("Return " + page + " to client");
         return page;
     }
 }
