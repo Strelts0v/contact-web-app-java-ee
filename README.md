@@ -7,3 +7,8 @@ Web app designed to manage user contacts, sending emails.
 - String Template
 - Twitter bootstrap
 - JUnit/Mockito for testing
+- MySQL database
+
+# Don't forget to do before launching app
+- create database using attached scripts
+- set permision on MySQL to store files bigger than 2 Mb
