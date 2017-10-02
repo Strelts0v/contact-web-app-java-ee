@@ -9,3 +9,7 @@
 .email-header{
     margin-bottom: 10px;
 }
+
+#email-error-box{
+    margin-top: 5px;
+}
