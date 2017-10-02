@@ -7,7 +7,9 @@ import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.actions.ContactAction;
 import com.itechart.app.model.actions.CreateContactAction;
 import com.itechart.app.model.actions.UpdateContactAction;
+import com.itechart.app.model.actions.utils.ContactActionProperties;
 import com.itechart.app.model.factories.ContactActionFactory;
+import com.itechart.app.model.utils.PageConfigurationManager;
 import org.apache.commons.fileupload.FileItem;
 
 import javax.servlet.RequestDispatcher;
@@ -50,43 +52,52 @@ public class ContactRestFrontController extends HttpServlet{
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        try {
+            // Create RestRequest object to handle REST request
+            RestRequest restRequest = new RestRequest(request.getPathInfo());
 
-        // Create RestRequest object to handle REST request
-        RestRequest restRequest = new RestRequest(request.getPathInfo());
+            // Create wrapper for HttpServletRequest for getting params from JSP
+            // and inserting attributes back to JSP
+            RequestContent requestContent = new RequestContent(request);
 
-        // Create wrapper for HttpServletRequest for getting params from JSP
-        // and inserting attributes back to JSP
-        RequestContent requestContent = new RequestContent(request);
-
-        // Check if the rest request contains resource id and if so
-        // add this attribute to RequestContent
-        if(restRequest.hasResourceId()){
-            requestContent.insertAttribute(RESOURCE_ID_ATTRIBUTE, restRequest.getResourceId());
-        }
-
-        // identify command coming from JSP
-        ContactActionFactory factory = new ContactActionFactory();
-        ContactAction action = factory.defineContactAction(restRequest.getActionFromRestUrl());
-
-        // check if there is upload or create contact action it is
-        // use ContactUploadHelper to upload files and other attributes from client
-        if(isActionNeedFileUpload(action, requestContent)){
-            try {
-                ContactUploadHelper uploadHelper = new ContactUploadHelper();
-                List<FileItem> fileItems = uploadHelper.getUploadFileItems(request, getServletContext());
-                requestContent.insertAttribute(FILE_ITEMS_ATTRIBUTE, fileItems);
-            } catch (ServletException se){
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                AppLogger.error(se.getMessage());
-                return;
+            // Check if the rest request contains resource id and if so
+            // add this attribute to RequestContent
+            if (restRequest.hasResourceId()) {
+                requestContent.insertAttribute(RESOURCE_ID_ATTRIBUTE, restRequest.getResourceId());
             }
+
+            // identify command coming from JSP
+            ContactActionFactory factory = new ContactActionFactory();
+            ContactAction action = factory.defineContactAction(restRequest.getActionFromRestUrl());
+
+            // check if there is upload or create contact action it is
+            // use ContactUploadHelper to upload files and other attributes from client
+            if (isActionNeedFileUpload(action, requestContent)) {
+                try {
+                    AppLogger.info("Initializing of ContactUploadHelper...");
+                    ContactUploadHelper uploadHelper = new ContactUploadHelper();
+                    List<FileItem> fileItems = uploadHelper.getUploadFileItems(request, getServletContext());
+                    requestContent.insertAttribute(FILE_ITEMS_ATTRIBUTE, fileItems);
+                    AppLogger.info("ContactUploadHelper returned FileItem objects.");
+                } catch (ServletException se) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    AppLogger.error(se.getMessage());
+                    return;
+                }
+            }
+
+            // handle request according type of action
+            String pagePath = action.execute(requestContent);
+
+            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(pagePath);
+            dispatcher.forward(request, response);
+        } catch (ServletException se){
+            String pagePath = PageConfigurationManager
+                    .getPageName(ContactActionProperties.ERROR_PAGE_NAME);
+
+            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(pagePath);
+            dispatcher.forward(request, response);
         }
-
-        // handle request according type of action
-        String pagePath = action.execute(requestContent);
-
-        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(pagePath);
-        dispatcher.forward(request, response);
     }
 
     private boolean isActionNeedFileUpload(ContactAction action, RequestContent requestContent){

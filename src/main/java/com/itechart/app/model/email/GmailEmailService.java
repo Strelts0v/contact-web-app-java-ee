@@ -62,6 +62,7 @@ public class GmailEmailService implements EmailService {
             message.setSubject(subject);
             message.setText(messageText);
             Transport.send(message);
+            AppLogger.info("Email to address " + toEmail + " was successfully send.");
         } catch (MessagingException me) {
             AppLogger.error(me.getMessage());
             throw new EmailSendingException(me);

@@ -284,9 +284,6 @@
                                     <button class="btn btn-xs btn-warning" onclick="showAttachmentModal(editAttachment, this)">
                                         <i class="fa fa-pencil fa-lg"></i>
                                     </button>
-                                    <button class="btn btn-xs btn-info" onclick="downloadAttachment(this)">
-                                        <i class="fa fa-download fa-lg"></i>
-                                    </button>
                                 </div>
                             </td>
                         </tr>

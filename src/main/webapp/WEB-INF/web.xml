@@ -16,4 +16,10 @@
         <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
 
+    <listener>
+        <listener-class>
+            com.itechart.app.controller.listeners.ContactAppServletContextListener
+        </listener-class>
+    </listener>
+
 </web-app>

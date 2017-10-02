@@ -51,5 +51,25 @@
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.antlr:ST4:4.0.8" level="project" />
     <orderEntry type="library" name="Maven: org.antlr:antlr-runtime:3.5.2" level="project" />
+    <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.2.1" level="project" />
+    <orderEntry type="library" name="Maven: c3p0:c3p0:0.9.1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.6" level="project" />
+    <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz-jobs:2.2.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-ssh:2.10" level="project" />
+    <orderEntry type="library" name="Maven: com.jcraft:jsch:0.1.50" level="project" />
+    <orderEntry type="library" name="Maven: com.jcraft:jsch.agentproxy.connector-factory:0.0.6" level="project" />
+    <orderEntry type="library" name="Maven: com.jcraft:jsch.agentproxy.core:0.0.6" level="project" />
+    <orderEntry type="library" name="Maven: com.jcraft:jsch.agentproxy.usocket-jna:0.0.6" level="project" />
+    <orderEntry type="library" name="Maven: net.java.dev.jna:jna:3.4.0" level="project" />
+    <orderEntry type="library" name="Maven: net.java.dev.jna:platform:3.4.0" level="project" />
+    <orderEntry type="library" name="Maven: com.jcraft:jsch.agentproxy.usocket-nc:0.0.6" level="project" />
+    <orderEntry type="library" name="Maven: com.jcraft:jsch.agentproxy.sshagent:0.0.6" level="project" />
+    <orderEntry type="library" name="Maven: com.jcraft:jsch.agentproxy.pageant:0.0.6" level="project" />
+    <orderEntry type="library" name="Maven: com.jcraft:jsch.agentproxy.jsch:0.0.6" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-utils:3.0.15" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-ssh-common:2.10" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-interactivity-api:1.0-alpha-6" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-provider-api:2.10" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:1.7.21" level="project" />
   </component>
 </module>

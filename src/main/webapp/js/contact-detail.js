@@ -287,13 +287,8 @@ function createAttachmentControlTd(){
     downloadButton.className = "btn btn-xs btn-info";
     downloadButton.onclick = function(){downloadAttachment(this)};
 
-    var downloadIcon = document.createElement("i");
-    downloadIcon.className = "fa fa-download fa-lg";
-    downloadButton.appendChild(downloadIcon);
-
     btnGroupDiv.appendChild(deleteButton);
     btnGroupDiv.appendChild(editButton);
-    btnGroupDiv.appendChild(downloadButton);
 
     controlTd.appendChild(btnGroupDiv);
 

@@ -1,6 +1,8 @@
 package com.itechart.app.controller.listeners;
 
-import javax.servlet.ServletContext;
+import com.itechart.app.logging.AppLogger;
+import com.itechart.app.model.jobs.JobScheduler;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -11,13 +13,11 @@ public class ContactAppServletContextListener implements ServletContextListener{
 
     private static final String ROOT_PATH_VARIABLE_NAME = "rootPath";
 
-    /**
-     * sets rootPath property to implement system independent
-     * and path-relative destination of file with logs
-     */
     public void contextInitialized(ServletContextEvent event) {
-        ServletContext context = event.getServletContext();
-        System.setProperty(ROOT_PATH_VARIABLE_NAME, context.getRealPath("/"));
+        // launches job scheduler
+        JobScheduler scheduler = JobScheduler.getInstance();
+        scheduler.initializeJobScheduler();
+        AppLogger.info("Job scheduler was launched");
     }
 
     public void contextDestroyed(ServletContextEvent event) {
