@@ -4,48 +4,20 @@ import com.itechart.app.model.actions.*;
 
 public enum ContactActionEnum {
 
-    CREATE_CONTACT{
-        {
-            action = new CreateContactAction();
-        }
-    },
-    GET_CONTACT{
-        {
-            action = new GetContactAction();
-        }
-    },
-    GET_CONTACTS{
-        {
-            action = new GetContactsAction();
-        }
-    },
-    UPDATE_CONTACT{
-        {
-            action = new UpdateContactAction();
-        }
-    },
-    DELETE_CONTACT{
-        {
-            action = new DeleteContactAction();
-        }
-    },
-    SEARCH_CONTACT{
-        {
-            action = new SearchContactAction();
-        }
-    },
-    SEND_EMAIL_TO_CONTACTS{
-        {
-            action = new SendEmailToContactsAction();
-        }
-    },
-    ERROR{
-        {
-            action = new ErrorContactAction();
-        }
-    };
+    CREATE_CONTACT(new CreateContactAction()),
+    GET_CONTACT(new GetContactAction()),
+    GET_CONTACTS(new GetContactsAction()),
+    UPDATE_CONTACT(new UpdateContactAction()),
+    DELETE_CONTACT(new DeleteContactAction()),
+    SEARCH_CONTACT(new SearchContactAction()),
+    SEND_EMAIL_TO_CONTACTS(new SendEmailToContactsAction()),
+    ERROR(new ErrorContactAction());
 
-    ContactAction action;
+    ContactActionEnum(ContactAction action){
+        this.action = action;
+    }
+
+    private ContactAction action;
 
     public ContactAction getCurrentContactAction(){
         return action;
