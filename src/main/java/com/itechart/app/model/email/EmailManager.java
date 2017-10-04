@@ -3,11 +3,15 @@ package com.itechart.app.model.email;
 import com.itechart.app.model.actions.utils.ContactActionProperties;
 import com.itechart.app.model.enums.EmailTemplateEnum;
 import com.itechart.app.model.exceptions.EmailSendingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
 public class EmailManager {
+
+    private final Logger logger = LoggerFactory.getLogger(EmailManager.class);
 
     private EmailService service;
 
@@ -30,5 +34,7 @@ public class EmailManager {
         ));
 
         emailSender.start();
+
+        logger.info("Email sender was successfully start.");
     }
 }

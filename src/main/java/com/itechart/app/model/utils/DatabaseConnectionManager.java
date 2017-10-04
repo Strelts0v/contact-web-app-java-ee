@@ -1,9 +1,10 @@
 package com.itechart.app.model.utils;
 
-import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.cryptography.Cryptographer;
 import com.itechart.app.model.cryptography.CryptographerXor;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
@@ -15,6 +16,8 @@ import java.util.ResourceBundle;
  */
 public class DatabaseConnectionManager {
 
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectionManager.class);
+
     private ComboPooledDataSource dataSource;
 
     private volatile static DatabaseConnectionManager INSTANCE;
@@ -24,19 +27,13 @@ public class DatabaseConnectionManager {
             = ResourceBundle.getBundle("dbconfig");
 
     private static final String DATABASE_DRIVER_KEY = "database.driver";
-
     private static final String DATABASE_URL_KEY = "database.url";
-
     private static final String DATABASE_USER_KEY = "database.user";
-
     private static final String DATABASE_PASSWORD_KEY = "database.password";
-
     private static final String DATABASE_CONNECTION_POOL_MIN_SIZE_KEY
             = "database.connection.pool.min.size";
-
     private static final String DATABASE_CONNECTION_POOL_ACQUIRE_INCREMENT_KEY
             = "database.connection.pool.acquire.increment";
-
     private static final String DATABASE_CONNECTION_POOL_MAX_SIZE_KEY
             = "database.connection.pool.max.size";
 
@@ -71,7 +68,7 @@ public class DatabaseConnectionManager {
                 }
             }
         }catch (PropertyVetoException e){
-            AppLogger.error(e.getMessage());
+            logger.error(e.getMessage());
         }
         return INSTANCE;
     }

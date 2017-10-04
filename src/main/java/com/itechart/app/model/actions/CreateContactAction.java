@@ -1,7 +1,6 @@
 package com.itechart.app.model.actions;
 
 import com.itechart.app.controller.utils.RequestContent;
-import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.actions.utils.ContactActionProperties;
 import com.itechart.app.model.dao.ContactDao;
 import com.itechart.app.model.dao.JdbcContactDao;
@@ -12,6 +11,8 @@ import com.itechart.app.model.entities.Photo;
 import com.itechart.app.model.exceptions.ContactDaoException;
 import com.itechart.app.model.utils.*;
 import org.apache.commons.fileupload.FileItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 public class CreateContactAction implements ContactAction{
+
+    private final Logger logger = LoggerFactory.getLogger(CreateContactAction.class);
 
     private Map<String, String> contactPropertiesMap;
     private Map<String, Attachment> attachmentsMap;
@@ -37,7 +40,7 @@ public class CreateContactAction implements ContactAction{
                 ContactActionProperties.CONTACT_SUBMIT_PARAM));
         if(!isSubmit){
             page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_DETAIL_PAGE_NAME);
-            AppLogger.info("Get contact-detail.jsp for creating new contact.");
+            logger.info("Get contact-detail.jsp for creating new contact.");
         } else {
             // parse FileItem objects into Contact entities
             List<FileItem> items = (List<FileItem>) requestContent.getAttribute(ContactActionProperties.FILE_ITEMS_ATTRIBUTE);
@@ -82,20 +85,20 @@ public class CreateContactAction implements ContactAction{
 
                     page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_DETAIL_PAGE_NAME);
                 }
-                AppLogger.info("Creating of new contact was successful.");
+                logger.info("Creating of new contact was successful.");
             }catch (ContactDaoException cde){
-                AppLogger.error(cde.getMessage());
+                logger.error(cde.getMessage());
                 if(dao != null) {
                     try {
                         dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_UNSUCCESSFUL);
                     } catch (ContactDaoException cdex){
-                        AppLogger.error(cdex.getMessage());
+                        logger.error(cdex.getMessage());
                     }
                 }
                 page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
             }
         }
-        AppLogger.info("Return " + page + " to client");
+        logger.info("Return " + page + " to client");
         return page;
     }
 
@@ -125,7 +128,7 @@ public class CreateContactAction implements ContactAction{
                 attachment.setFileSize((int) item.getSize());
             }
         } catch (IOException e){
-            AppLogger.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 }

@@ -1,9 +1,10 @@
 package com.itechart.app.model.email;
 
-import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.cryptography.Cryptographer;
 import com.itechart.app.model.cryptography.CryptographerXor;
 import com.itechart.app.model.exceptions.EmailSendingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -16,6 +17,8 @@ import java.util.Properties;
  * implementation of EmailService interface using gmail via TLS
  */
 public class GmailEmailService implements EmailService {
+
+    private final Logger logger = LoggerFactory.getLogger(GmailEmailService.class);
 
     /**
      * java mail session object
@@ -62,9 +65,9 @@ public class GmailEmailService implements EmailService {
             message.setSubject(subject);
             message.setText(messageText);
             Transport.send(message);
-            AppLogger.info("Email to address " + toEmail + " was successfully send.");
+            logger.info("Email to address " + toEmail + " was successfully send.");
         } catch (MessagingException me) {
-            AppLogger.error(me.getMessage());
+            logger.error(me.getMessage() + ". Error during sending email to address " + toEmail);
             throw new EmailSendingException(me);
         }
     }

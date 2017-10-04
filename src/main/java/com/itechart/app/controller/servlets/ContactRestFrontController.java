@@ -3,7 +3,6 @@ package com.itechart.app.controller.servlets;
 import com.itechart.app.controller.utils.ContactUploadHelper;
 import com.itechart.app.controller.utils.RequestContent;
 import com.itechart.app.controller.utils.RestRequest;
-import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.actions.ContactAction;
 import com.itechart.app.model.actions.CreateContactAction;
 import com.itechart.app.model.actions.UpdateContactAction;
@@ -11,6 +10,8 @@ import com.itechart.app.model.actions.utils.ContactActionProperties;
 import com.itechart.app.model.factories.ContactActionFactory;
 import com.itechart.app.model.utils.PageConfigurationManager;
 import org.apache.commons.fileupload.FileItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -21,6 +22,8 @@ import java.io.IOException;
 import java.util.List;
 
 public class ContactRestFrontController extends HttpServlet{
+
+    private final Logger logger = LoggerFactory.getLogger(ContactRestFrontController.class);
 
     private static final String RESOURCE_ID_ATTRIBUTE = "contactId";
     private static final String FILE_ITEMS_ATTRIBUTE = "fileItems";
@@ -74,14 +77,14 @@ public class ContactRestFrontController extends HttpServlet{
             // use ContactUploadHelper to upload files and other attributes from client
             if (isActionNeedFileUpload(action, requestContent)) {
                 try {
-                    AppLogger.info("Initializing of ContactUploadHelper...");
+                    logger.info("Initializing of ContactUploadHelper...");
                     ContactUploadHelper uploadHelper = new ContactUploadHelper();
                     List<FileItem> fileItems = uploadHelper.getUploadFileItems(request, getServletContext());
                     requestContent.insertAttribute(FILE_ITEMS_ATTRIBUTE, fileItems);
-                    AppLogger.info("ContactUploadHelper returned FileItem objects.");
+                    logger.info("ContactUploadHelper returned FileItem objects.");
                 } catch (ServletException se) {
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                    AppLogger.error(se.getMessage());
+                    logger.error(se.getMessage());
                     return;
                 }
             }

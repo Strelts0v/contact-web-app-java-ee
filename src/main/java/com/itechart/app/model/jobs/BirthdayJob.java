@@ -1,6 +1,5 @@
 package com.itechart.app.model.jobs;
 
-import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.actions.utils.ContactActionProperties;
 import com.itechart.app.model.dao.ContactDao;
 import com.itechart.app.model.dao.JdbcContactDao;
@@ -12,10 +11,14 @@ import com.itechart.app.model.exceptions.EmailSendingException;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class BirthdayJob implements Job {
+
+    private final Logger logger = LoggerFactory.getLogger(BirthdayJob.class);
 
     private static final String EMAIL_FROM_PARAM = "ka1oken4by@gmail.com";
     private static final String EMAIL_FROM_FIRST_NAME = "Gleb";
@@ -39,21 +42,21 @@ public class BirthdayJob implements Job {
                 try {
                     emailManager.sendEmail(emailList, EmailTemplateEnum.BIRTHDAY, emailParamsMap);
                 } catch (EmailSendingException ese){
-                    AppLogger.error(ese.getMessage());
+                    logger.error(ese.getMessage());
                     throw new JobExecutionException("Error during sending email");
                 }
-                AppLogger.info("Birthday message was successfully send to email: " + contact.getEmail());
+                logger.info("Birthday message was successfully send to email: " + contact.getEmail());
             }
 
             dao.closeDao();
         } catch(ContactDaoException cde){
-            AppLogger.error(cde.getMessage());
+            logger.error(cde.getMessage());
             try {
                 if(dao != null) {
                     dao.closeDao();
                 }
             } catch (ContactDaoException cdex){
-                AppLogger.error(cde.getMessage());
+                logger.error(cde.getMessage());
             }
         }
     }
