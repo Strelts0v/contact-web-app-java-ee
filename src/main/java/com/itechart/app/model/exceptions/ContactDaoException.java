@@ -2,8 +2,7 @@ package com.itechart.app.model.exceptions;
 
 public class ContactDaoException extends Exception{
 
-   public ContactDaoException(){
-   }
+   public ContactDaoException(){}
 
    public ContactDaoException(String message, Throwable exception){
        super(message, exception);
