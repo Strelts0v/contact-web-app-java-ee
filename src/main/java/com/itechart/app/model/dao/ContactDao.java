@@ -146,6 +146,22 @@ public interface ContactDao {
     List<Contact> getContactsByBirthday(java.util.Date today) throws ContactDaoException;
 
     /**
+     * returns attachments ids of contact with @param contactId
+     * @param contactId - unique id of contact
+     * @return list of attachment ids
+     * @throws ContactDaoException
+     */
+    List<Integer> getContactAttachmentIds(int contactId) throws ContactDaoException;
+
+    /**
+     * returns phone ids of contact with @param contactId
+     * @param contactId - unique id of contact
+     * @return list of phone ids
+     * @throws ContactDaoException
+     */
+    List<Integer> getContactPhonesIds(int contactId) throws ContactDaoException;
+
+    /**
      * perform actions to close dao object
      * @param wasDaoActionsSuccessful - indicated was any mistake in dao actions
      * @throws ContactDaoException - if there is error during performing method
