@@ -3,16 +3,19 @@ package com.itechart.app.model.actions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.itechart.app.controller.utils.RequestContent;
-import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.actions.utils.ContactActionProperties;
 import com.itechart.app.model.dao.JdbcContactDao;
 import com.itechart.app.model.entities.Contact;
 import com.itechart.app.model.exceptions.ContactDaoException;
 import com.itechart.app.model.utils.PageConfigurationManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class DeleteContactAction implements ContactAction{
+
+    private final Logger logger = LoggerFactory.getLogger(DeleteContactAction.class);
 
     public String execute(RequestContent requestContent) {
         String page;
@@ -29,7 +32,7 @@ public class DeleteContactAction implements ContactAction{
                 dao.initializeDao();
                 for (int i = 0; i < contactIds.length; i++) {
                     dao.deleteContact(contactIds[i]);
-                    AppLogger.info("Deleting of contact with id=" + contactIds[i] + " was successful.");
+                    logger.info("Deleting of contact with id=" + contactIds[i] + " was successful.");
                 }
                 // after deleting return page with contacts without deleted ones
                 List<Contact> contactList = dao.getContacts(ContactActionProperties.INITIAL_CONTACT_OFFSET,
@@ -41,17 +44,17 @@ public class DeleteContactAction implements ContactAction{
             }
 
         } catch (ContactDaoException cde){
-            AppLogger.error(cde.getMessage());
+            logger.error(cde.getMessage());
             if(dao != null) {
                 try {
                     dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_UNSUCCESSFUL);
                 } catch (ContactDaoException cdex){
-                    AppLogger.error(cdex.getMessage());
+                    logger.error(cdex.getMessage());
                 }
             }
             page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
         }
-        AppLogger.info("Return " + page + " to client");
+        logger.info("Return " + page + " to client");
         return page;
     }
 
