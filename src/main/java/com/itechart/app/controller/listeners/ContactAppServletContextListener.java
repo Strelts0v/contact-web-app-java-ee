@@ -1,7 +1,8 @@
 package com.itechart.app.controller.listeners;
 
-import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.jobs.JobScheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -11,13 +12,13 @@ import javax.servlet.ServletContextListener;
  */
 public class ContactAppServletContextListener implements ServletContextListener{
 
-    private static final String ROOT_PATH_VARIABLE_NAME = "rootPath";
+    private final Logger logger = LoggerFactory.getLogger(ContactAppServletContextListener.class);
 
     public void contextInitialized(ServletContextEvent event) {
         // launches job scheduler
         JobScheduler scheduler = JobScheduler.getInstance();
         scheduler.initializeJobScheduler();
-        AppLogger.info("Job scheduler was launched");
+        logger.info("Job scheduler was launched");
     }
 
     public void contextDestroyed(ServletContextEvent event) {
