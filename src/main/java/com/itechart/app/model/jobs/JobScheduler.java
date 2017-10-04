@@ -1,17 +1,20 @@
 package com.itechart.app.model.jobs;
 
-import com.itechart.app.logging.AppLogger;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 public class JobScheduler {
+
+    private final Logger logger = LoggerFactory.getLogger(JobScheduler.class);
 
     private volatile static JobScheduler INSTANCE;
 
@@ -25,7 +28,7 @@ public class JobScheduler {
         try {
             scheduler = StdSchedulerFactory.getDefaultScheduler();
         } catch (SchedulerException se){
-            AppLogger.error(se.getMessage());
+            logger.error(se.getMessage());
         }
     }
 
@@ -59,7 +62,7 @@ public class JobScheduler {
 
             scheduler.start();
         }catch (SchedulerException se){
-            AppLogger.error(se.getMessage());
+            logger.error(se.getMessage());
         }
     }
 }
