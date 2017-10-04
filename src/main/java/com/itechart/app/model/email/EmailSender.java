@@ -1,7 +1,8 @@
 package com.itechart.app.model.email;
 
-import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.exceptions.EmailSendingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -10,6 +11,8 @@ import java.util.List;
  * to specified list of addresses
  */
 public class EmailSender implements Runnable {
+
+    private final Logger logger = LoggerFactory.getLogger(EmailSender.class);
 
     private EmailService service;
 
@@ -59,7 +62,7 @@ public class EmailSender implements Runnable {
             try {
                 service.sendMessage(from, to, subject, messageText);
             } catch (EmailSendingException ese){
-                AppLogger.error(ese.getMessage());
+                logger.error(ese.getMessage());
             }
         }
     }
