@@ -3,7 +3,6 @@ package com.itechart.app.model.actions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.itechart.app.controller.utils.RequestContent;
-import com.itechart.app.logging.AppLogger;
 import com.itechart.app.model.actions.utils.ContactActionProperties;
 import com.itechart.app.model.dao.ContactDao;
 import com.itechart.app.model.dao.JdbcContactDao;
@@ -12,12 +11,16 @@ import com.itechart.app.model.enums.EmailTemplateEnum;
 import com.itechart.app.model.exceptions.ContactDaoException;
 import com.itechart.app.model.exceptions.EmailSendingException;
 import com.itechart.app.model.utils.PageConfigurationManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class SendEmailToContactsAction implements ContactAction{
+
+    private final Logger logger = LoggerFactory.getLogger(SendEmailToContactsAction.class);
 
     public String execute(RequestContent requestContent) {
         String page;
@@ -47,7 +50,7 @@ public class SendEmailToContactsAction implements ContactAction{
                         ContactActionProperties.EMAIL_TEMPLATE_PARAM);
                 emailTemplate = EmailTemplateEnum.valueOf(emailTemplateStr.toUpperCase());
             } catch (IllegalArgumentException iae){
-                AppLogger.error(iae.getMessage());
+                logger.error(iae.getMessage());
                 page = getEmailErrorPage();
                 insertEmailSendingRequestAttributes(requestContent,
                         ContactActionProperties.SENDING_EMAIL_WAS_UNSUCCESSFUL);
@@ -59,7 +62,7 @@ public class SendEmailToContactsAction implements ContactAction{
             try {
                 emailManager.sendEmail(emails, emailTemplate, emailParamsMap);
             } catch (EmailSendingException ese){
-                AppLogger.error(ese.getMessage());
+                logger.error(ese.getMessage());
                 page = getEmailErrorPage();
                 insertEmailSendingRequestAttributes(requestContent,
                         ContactActionProperties.SENDING_EMAIL_WAS_UNSUCCESSFUL);
@@ -71,7 +74,7 @@ public class SendEmailToContactsAction implements ContactAction{
                     ContactActionProperties.WAS_SENDING_EMAIL_SUCCESSFUL_REQUEST_ATTRIBUTE,
                     ContactActionProperties.SENDING_EMAIL_WAS_SUCCESSFUL);
         }
-        AppLogger.info("Return " + page + " to client");
+        logger.info("Return " + page + " to client");
         return page;
     }
 
@@ -111,13 +114,13 @@ public class SendEmailToContactsAction implements ContactAction{
             emailList = dao.getEmailsByIds(emailsIds);
             dao.closeDao();
         } catch (ContactDaoException cde){
-            AppLogger.error(cde.getMessage());
+            logger.error(cde.getMessage());
             try {
                 if(dao != null) {
                     dao.closeDao();
                 }
             } catch (ContactDaoException cdex){
-                AppLogger.error(cde.getMessage());
+                logger.error(cde.getMessage());
             }
         }
         return emailList;
