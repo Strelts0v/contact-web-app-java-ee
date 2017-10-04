@@ -1,6 +1,7 @@
 package com.itechart.app.controller.utils;
 
-import com.itechart.app.logging.AppLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import java.util.ArrayList;
@@ -9,6 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RestRequest {
+
+    private final Logger logger = LoggerFactory.getLogger(RestRequest.class);
 
     private String actionFromRestUrl;
 
@@ -48,7 +51,7 @@ public class RestRequest {
                 return;
             }
         }
-        AppLogger.info("Initializing of RestRequest was successful");
+        logger.info("Initializing of RestRequest was successful");
         throw new ServletException("Invalid URI");
     }
 
