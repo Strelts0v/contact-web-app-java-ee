@@ -15,7 +15,7 @@ public class EmailTemplateEngineTest {
     private final String expectedFirstName = "test fisrtname";
     private final String expectedSurname = "test lastname";
     private final String expectedMessage = "test message";
-    private final String expectedEmail = "test email@gmail.com";
+    private final String expectedEmail = "email@gmail.com";
     private final String expectedBirthdayFirstName = "test birthday first name";
     private final String expectedBirthdaySurname = "test birthday surname";
 
