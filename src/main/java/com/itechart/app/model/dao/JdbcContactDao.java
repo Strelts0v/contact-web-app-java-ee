@@ -2,13 +2,21 @@ package com.itechart.app.model.dao;
 
 import com.itechart.app.model.dao.utils.JdbcContactDaoHelper;
 import com.itechart.app.model.dao.utils.SearchTemplateEngine;
-import com.itechart.app.model.entities.*;
+import com.itechart.app.model.entities.Attachment;
+import com.itechart.app.model.entities.Contact;
+import com.itechart.app.model.entities.Phone;
+import com.itechart.app.model.entities.SearchContactDetails;
 import com.itechart.app.model.exceptions.ContactDaoException;
 import com.itechart.app.model.utils.DatabaseConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Savepoint;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
