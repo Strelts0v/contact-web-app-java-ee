@@ -14,15 +14,26 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class BirthdayJob implements Job {
 
     private final Logger logger = LoggerFactory.getLogger(BirthdayJob.class);
 
-    private static final String EMAIL_FROM_PARAM = "ka1oken4by@gmail.com";
-    private static final String EMAIL_FROM_FIRST_NAME = "Gleb";
-    private static final String EMAIL_FROM_SURNAME = "Streltsov";
+    /** object for extracting job config params from resource bundle jobs.properties */
+    private static final ResourceBundle jobsConfigBundle
+            = ResourceBundle.getBundle("jobs-params");
+
+    private final static String EMAIL_FIRST_NAME_PROPERTY_NAME = "job.birthday.email.from.firstname";
+    private final static String EMAIL_SURNAME_PROPERTY_NAME = "job.birthday.email.from.surname";
+    private final static String EMAIL_FROM_PROPERTY_NAME = "job.birthday.email.from";
+    private final static String EMAIL_SUBJECT_PROPERTY_NAME = "job.birthday.subject";
+    private final static String EMAIL_MESSAGE_PROPERTY_NAME = "job.birthday.message";
 
     public BirthdayJob(){
     }
@@ -30,6 +41,7 @@ public class BirthdayJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         ContactDao dao = null;
+        logger.info("starting of Birthday job...");
         try {
             dao = JdbcContactDao.newInstance();
             List<Contact> contactList = dao.getContactsByBirthday(new Date());
@@ -64,13 +76,19 @@ public class BirthdayJob implements Job {
     private Map<String, String> prepareEmailParams(Contact contact){
         Map<String, String> emailParamsMap = new HashMap<>();
 
-        emailParamsMap.put(ContactActionProperties.EMAIL_FIRST_NAME_PARAM, EMAIL_FROM_FIRST_NAME);
-        emailParamsMap.put(ContactActionProperties.EMAIL_LAST_NAME_PARAM, EMAIL_FROM_SURNAME);
-        emailParamsMap.put(ContactActionProperties.EMAIL_FROM_PARAM, EMAIL_FROM_PARAM);
+        emailParamsMap.put(ContactActionProperties.EMAIL_FIRST_NAME_PARAM,
+                jobsConfigBundle.getString(EMAIL_FIRST_NAME_PROPERTY_NAME));
+        emailParamsMap.put(ContactActionProperties.EMAIL_LAST_NAME_PARAM,
+                jobsConfigBundle.getString(EMAIL_SURNAME_PROPERTY_NAME));
+        emailParamsMap.put(ContactActionProperties.EMAIL_FROM_PARAM,
+                jobsConfigBundle.getString(EMAIL_FROM_PROPERTY_NAME));
+        emailParamsMap.put(ContactActionProperties.EMAIL_SUBJECT_PARAM,
+                jobsConfigBundle.getString(EMAIL_SUBJECT_PROPERTY_NAME));
+        emailParamsMap.put(ContactActionProperties.EMAIL_MESSAGE_PARAM,
+                jobsConfigBundle.getString(EMAIL_MESSAGE_PROPERTY_NAME));
+
         emailParamsMap.put(ContactActionProperties.EMAIL_BIRTHDAY_FIRST_NAME_PARAM, contact.getFirstName());
         emailParamsMap.put(ContactActionProperties.EMAIL_BIRTHDAY_LAST_NAME_PARAM, contact.getSurname());
-        emailParamsMap.put(ContactActionProperties.EMAIL_SUBJECT_PARAM, "Birthday");
-        emailParamsMap.put(ContactActionProperties.EMAIL_MESSAGE_PARAM, "Happy birthday! I wish you good health!");
 
         return emailParamsMap;
     }
