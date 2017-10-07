@@ -6,7 +6,11 @@ import com.itechart.app.model.exceptions.EmailSendingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.mail.*;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
@@ -63,7 +67,7 @@ public class GmailEmailService implements EmailService {
             message.setFrom(new InternetAddress(fromEmail));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
             message.setSubject(subject);
-            message.setText(messageText);
+            message.setContent(messageText, "text/html; charset=utf-8");
             Transport.send(message);
             logger.info("Email to address " + toEmail + " was successfully send.");
         } catch (MessagingException me) {
