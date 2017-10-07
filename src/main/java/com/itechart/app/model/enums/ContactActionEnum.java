@@ -1,6 +1,14 @@
 package com.itechart.app.model.enums;
 
-import com.itechart.app.model.actions.*;
+import com.itechart.app.model.actions.ContactAction;
+import com.itechart.app.model.actions.CreateContactAction;
+import com.itechart.app.model.actions.DeleteContactAction;
+import com.itechart.app.model.actions.ErrorContactAction;
+import com.itechart.app.model.actions.GetContactAction;
+import com.itechart.app.model.actions.GetContactsAction;
+import com.itechart.app.model.actions.SearchContactAction;
+import com.itechart.app.model.actions.SendEmailToContactsAction;
+import com.itechart.app.model.actions.UpdateContactAction;
 
 public enum ContactActionEnum {
 
