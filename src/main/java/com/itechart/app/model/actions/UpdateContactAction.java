@@ -9,13 +9,24 @@ import com.itechart.app.model.entities.Contact;
 import com.itechart.app.model.entities.Phone;
 import com.itechart.app.model.entities.Photo;
 import com.itechart.app.model.exceptions.ContactDaoException;
-import com.itechart.app.model.utils.*;
+import com.itechart.app.model.utils.AttachmentParser;
+import com.itechart.app.model.utils.AttachmentSorter;
+import com.itechart.app.model.utils.ContactMapper;
+import com.itechart.app.model.utils.PageConfigurationManager;
+import com.itechart.app.model.utils.PhoneParser;
+import com.itechart.app.model.utils.PhoneSorter;
+import com.itechart.app.model.utils.PhotoParser;
 import org.apache.commons.fileupload.FileItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class UpdateContactAction implements ContactAction{
 

@@ -38,8 +38,8 @@ public class ContactActionProperties {
     public final static String EMAIL_SUBMIT_PARAM = "submit";
     public final static String EMAILS_TO_SEND_PARAM = "emails-to-send";
     public final static String EMAIL_TEMPLATE_PARAM = "email-template";
-    public final static String EMAIL_BIRTHDAY_LAST_NAME_PARAM = "birthday-last-name";
-    public final static String EMAIL_BIRTHDAY_FIRST_NAME_PARAM = "birthday-first-name";
+    public final static String EMAIL_BIRTHDAY_LAST_NAME_PARAM = "birthdayLastName";
+    public final static String EMAIL_BIRTHDAY_FIRST_NAME_PARAM = "birthdayFirstName";
     public final static String EMAIL_PHONE_PARAM = "phone";
     public final static String EMAIL_FROM_PARAM = "email";
     public final static String EMAIL_FIRST_NAME_PARAM = "firstname";

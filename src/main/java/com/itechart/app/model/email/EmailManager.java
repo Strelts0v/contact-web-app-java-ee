@@ -3,6 +3,7 @@ package com.itechart.app.model.email;
 import com.itechart.app.model.actions.utils.ContactActionProperties;
 import com.itechart.app.model.enums.EmailTemplateEnum;
 import com.itechart.app.model.exceptions.EmailSendingException;
+import com.itechart.app.model.exceptions.EmailTemplateEngineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,13 @@ public class EmailManager {
                           Map<String, String> emailParamsMap) throws EmailSendingException{
 
         EmailTemplateEngine templateEngine = new EmailTemplateEngine();
-        String body = templateEngine.generateTemplate(emailTemplate, emailParamsMap);
+        String body;
+        try {
+            body = templateEngine.generateTemplate(emailTemplate, emailParamsMap);
+        } catch (EmailTemplateEngineException etee){
+            logger.error(etee.getMessage());
+            throw new EmailSendingException(etee);
+        }
 
         Thread emailSender = new Thread(new EmailSender(
                 service,
@@ -34,7 +41,6 @@ public class EmailManager {
         ));
 
         emailSender.start();
-
         logger.info("Email sender was successfully start.");
     }
 }

@@ -1,0 +1,24 @@
+<job-scheduling-data
+        xmlns="http://www.quartz-scheduler.org/xml/JobSchedulingData"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.quartz-scheduler.org/xml/JobSchedulingData
+         http://www.quartz-scheduler.org/xml/job_scheduling_data_1_8.xsd"
+        version="1.8">
+    <schedule>
+        <job>
+            <name>birthday-job</name>
+            <group>birthday-group</group>
+            <description>Send birthday congratulation message to contacts who has birthday today</description>
+            <job-class>com.itechart.app.model.jobs.BirthdayJob</job-class>
+        </job>
+        <trigger>
+            <cron>
+                <name>birthday-trigger</name>
+                <job-name>birthday-job</job-name>
+                <job-group>birthday-group</job-group>
+                <!-- It will run at 10 a.m. every day -->
+                <cron-expression>0 16 15 * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
+</job-scheduling-data>
