@@ -129,7 +129,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="birthday-first-name">Birthday person first name *</label>
-                                        <input id="birthday-first-name" type="text" name="birthday-first-name" class="form-control"
+                                        <input id="birthday-first-name" type="text" name="birthdayFirstName" class="form-control"
                                                placeholder="Please enter first name who celebrates birthday *"
                                                data-error="first name is required.">
                                         <div class="help-block with-errors"></div>
@@ -138,7 +138,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="birthday-last-name">Birthday person last name *</label>
-                                        <input id="birthday-last-name" type="text" name="birthday-last-name"
+                                        <input id="birthday-last-name" type="text" name="birthdayLastName"
                                                class="form-control" placeholder="Please enter last name who celebrates birthday *"
                                                data-error="last name is required.">
                                         <div class="help-block with-errors"></div>
