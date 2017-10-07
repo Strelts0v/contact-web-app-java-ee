@@ -60,6 +60,7 @@ public class EmailSender implements Runnable {
     public void run() {
         for(String to : destinationEmailList) {
             try {
+                logger.info("Sending email to address " + to);
                 service.sendMessage(from, to, subject, messageText);
             } catch (EmailSendingException ese){
                 logger.error(ese.getMessage());
