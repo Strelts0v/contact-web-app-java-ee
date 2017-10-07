@@ -1,5 +1,18 @@
+const EMAIL_TO_SEND_TABLE_BODY_ID = "table-body-emails-to-send";
+const EMAIL_TO_SEND_INPUT_ID = "form-email-to";
+const EMAILS_TO_SEND_INPUT_ID = "emails-to-send";
+
+(function initializeEmailToSendListInput(){
+    var emailTableBody = document.getElementById(EMAIL_TO_SEND_TABLE_BODY_ID);
+    var emailTrList = emailTableBody.children;
+    for(var i = 0; i < emailTrList.length; i++) {
+        var emailTd = emailTrList[i].children[0];   // get td with email
+        var email = emailTd.innerText;
+        addEmailToForm(email);
+    }
+})();
+
 function addEmailToSendList(){
-    const EMAIL_TO_SEND_INPUT_ID = "form-email-to";
     var emailToInput = document.getElementById(EMAIL_TO_SEND_INPUT_ID);
     var emailAddress = emailToInput.value;
 
@@ -9,7 +22,6 @@ function addEmailToSendList(){
     }
     disableInvalidEmailMessage();
 
-    const EMAIL_TO_SEND_TABLE_BODY_ID = "table-body-emails-to-send";
     var emailTableBody = document.getElementById(EMAIL_TO_SEND_TABLE_BODY_ID);
 
     // creating of table row in emails to send table
@@ -61,12 +73,12 @@ function checkEmailField(emailValue){
 const EMAIL_ERROR_DIV_ID = "email-error-box";
 
 function setInvalidEmailMessage(){
-    var errorBoxDiv = document.getElementById(EMAIL_ERROR_DIV_ID)
+    var errorBoxDiv = document.getElementById(EMAIL_ERROR_DIV_ID);
     errorBoxDiv.className = "";
 }
 
 function disableInvalidEmailMessage(){
-    var errorBoxDiv = document.getElementById(EMAIL_ERROR_DIV_ID)
+    var errorBoxDiv = document.getElementById(EMAIL_ERROR_DIV_ID);
     errorBoxDiv.className = "hidden";
 }
 
@@ -96,8 +108,6 @@ function selectTemplate(templateValue){
     var emailTemplateInput = document.getElementById(EMAIL_TEMPLATE_INPUT_ID);
     emailTemplateInput.value = templateValue;
 }
-
-const EMAILS_TO_SEND_INPUT_ID = "emails-to-send";
 
 function addEmailToForm(emailAddress){
     var emailsToSendInput = document.getElementById(EMAILS_TO_SEND_INPUT_ID);
