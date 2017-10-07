@@ -8,22 +8,31 @@ import java.util.Map;
 
 public enum EmailTemplateEnum {
 
-    DEFAULT, BIRTHDAY;
+    DEFAULT("default.ftlh"),
+    BIRTHDAY("birthday.ftlh");
+
+    EmailTemplateEnum(String emailTemplateFileName){
+        this.emailTemplateFileName = emailTemplateFileName;
+    }
+
+    private String emailTemplateFileName;
+
+    public String getEmailTemplateFileName(){
+        return emailTemplateFileName;
+    }
 
     public Map<String, String> getEmailParamsMap(RequestContent requestContent){
         Map<String, String> emailParamsMap = new HashMap<>();
         switch (this){
             case DEFAULT:
-               emailParamsMap = getDefaultEmailParamsMap(emailParamsMap, requestContent);
+                emailParamsMap = getDefaultEmailParamsMap(emailParamsMap, requestContent);
                 break;
-
             case BIRTHDAY:
                 emailParamsMap = getBirthdayEmailParamsMap(emailParamsMap, requestContent);
                 break;
         }
         return emailParamsMap;
     }
-
     private Map<String, String> getBirthdayEmailParamsMap(Map<String, String> emailParamsMap,
                                                           RequestContent requestContent){
         emailParamsMap.put(ContactActionProperties.EMAIL_FIRST_NAME_PARAM,
