@@ -15,7 +15,7 @@ public class AttachmentParser {
         Type type = new TypeToken<List<Attachment>>(){}.getType();
 
         // here method getString() from FileItem should return JSON string
-        String json = item.getString();
+        String json = StringUtf8Encoder.getString(item);
         List<Attachment> attachments = gson.fromJson(json, type);
 
         // set contact id to each attachment object
@@ -31,7 +31,7 @@ public class AttachmentParser {
         Type type = new TypeToken<List<Attachment>>(){}.getType();
 
         // here method getString() from FileItem should return JSON string
-        String json = item.getString();
+        String json = StringUtf8Encoder.getString(item);
         List<Attachment> attachments = gson.fromJson(json, type);
 
         return attachments;

@@ -16,6 +16,7 @@ import com.itechart.app.model.utils.PageConfigurationManager;
 import com.itechart.app.model.utils.PhoneParser;
 import com.itechart.app.model.utils.PhoneSorter;
 import com.itechart.app.model.utils.PhotoParser;
+import com.itechart.app.model.utils.StringUtf8Encoder;
 import org.apache.commons.fileupload.FileItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,8 +118,6 @@ public class UpdateContactAction implements ContactAction{
                 for(int attachmentId : deletePhoneIds){
                     dao.deletePhoneFromContact(attachmentId);
                 }
-                dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
-                logger.info("Updating of contact with id=" + getContactId() + " was successful");
 
                 // save updated contact as attribute for sending on client
                 contact = dao.getContact(getContactId());
@@ -127,6 +126,8 @@ public class UpdateContactAction implements ContactAction{
                         ContactActionProperties.WAS_CONTACT_SUCCESSFULLY_SAVED_REQUEST_ATTRIBUTE,
                         ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
 
+                dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
+                logger.info("Updating of contact with id=" + getContactId() + " was successful");
                 page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_DETAIL_PAGE_NAME);
             }
         }catch (ContactDaoException cde){
@@ -153,7 +154,7 @@ public class UpdateContactAction implements ContactAction{
                 attachmentsMap.put(attachment.getFileName(), attachment);
             }
         } else {
-            contactPropertiesMap.put(item.getFieldName(), item.getString());
+            contactPropertiesMap.put(item.getFieldName(), StringUtf8Encoder.getString(item));
         }
     }
 
@@ -163,7 +164,6 @@ public class UpdateContactAction implements ContactAction{
                 photo = PhotoParser.parsePhoto(item);
                 return;
             }
-
             Attachment attachment = attachmentsMap.get(item.getFieldName());
             if (attachment != null) {
                 attachment.setContactId(getContactId());

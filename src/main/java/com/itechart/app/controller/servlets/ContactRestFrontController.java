@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class ContactRestFrontController extends HttpServlet{
@@ -56,6 +57,9 @@ public class ContactRestFrontController extends HttpServlet{
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            // Set encoding UTF-8
+            request.setCharacterEncoding(StandardCharsets.UTF_8.toString());
+            response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
             // Create RestRequest object to handle REST request
             RestRequest restRequest = new RestRequest(request.getPathInfo());
 
