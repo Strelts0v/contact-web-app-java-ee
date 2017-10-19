@@ -15,7 +15,7 @@ public class PhoneParser {
         Type type = new TypeToken<List<Phone>>(){}.getType();
 
         // here method getString() from FileItem should return JSON string
-        List<Phone> phones = gson.fromJson(item.getString(), type);
+        List<Phone> phones = gson.fromJson(StringUtf8Encoder.getString(item), type);
 
         // set contact id to each phone object
         for(Phone phone : phones){
@@ -30,7 +30,7 @@ public class PhoneParser {
         Type type = new TypeToken<List<Phone>>(){}.getType();
 
         // here method getString() from FileItem should return JSON string
-        List<Phone> phones = gson.fromJson(item.getString(), type);
+        List<Phone> phones = gson.fromJson(StringUtf8Encoder.getString(item), type);
 
         return phones;
     }

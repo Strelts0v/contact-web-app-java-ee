@@ -14,6 +14,7 @@ import com.itechart.app.model.utils.ContactMapper;
 import com.itechart.app.model.utils.PageConfigurationManager;
 import com.itechart.app.model.utils.PhoneParser;
 import com.itechart.app.model.utils.PhotoParser;
+import com.itechart.app.model.utils.StringUtf8Encoder;
 import org.apache.commons.fileupload.FileItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +116,7 @@ public class CreateContactAction implements ContactAction{
                 attachmentsMap.put(attachment.getFileName(), attachment);
             }
         } else {
-            contactPropertiesMap.put(item.getFieldName(), item.getString());
+            contactPropertiesMap.put(item.getFieldName(), StringUtf8Encoder.getString(item));
         }
     }
 

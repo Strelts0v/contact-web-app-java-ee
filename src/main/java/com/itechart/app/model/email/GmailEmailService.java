@@ -53,7 +53,7 @@ public class GmailEmailService implements EmailService {
                     protected PasswordAuthentication getPasswordAuthentication() {
                         return new PasswordAuthentication(
                                 PROPERTIES.getProperty("mail.username"),
-                                cryptographer.decrypt(PROPERTIES.getProperty("mail.password"))
+                                PROPERTIES.getProperty("mail.password")
                         );
                     }
                 });
