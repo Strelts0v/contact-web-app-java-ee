@@ -121,6 +121,9 @@ window.onclick = function(event) {
         case PHONE_MODAL:
             PHONE_MODAL.style.display = "none";
             break;
+        case PHOTO_MODAL:
+            PHOTO_MODAL.style.display = "none";
+            break;
     }
 }
 
@@ -711,7 +714,7 @@ function disableTooManyPhonesCheckedWarning(){
 // PHOTO MODAL FUNCTIONS            //////
 //////////////////////////////////////////
 
-const PHOTO_MODAL = document.getElementById('photo-modal');
+const PHOTO_MODAL = document.getElementById("photo-modal");
 
 const PHOTO_MODAL_FILE_ID = "upload-photo";
 
@@ -744,6 +747,13 @@ function savePhoto(){
 
     cancelPhoto();
 }
+
+// function setPhoto(photoData){
+//     var photoDiv = document.getElementById(CONTACT_PHOTO_DIV_ID);
+//     const photoImgDivIndex = 0;
+//     var photoImg = photoDiv.children[photoImgDivIndex];
+//     photoImg.src = "data:image/png;base64," + photoData;
+// }
 
 function cancelPhoto(){
     document.getElementById(PHOTO_MODAL_FILE_ID).value = null;
