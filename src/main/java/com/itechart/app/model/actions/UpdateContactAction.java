@@ -18,11 +18,13 @@ import com.itechart.app.model.utils.PhoneSorter;
 import com.itechart.app.model.utils.PhotoParser;
 import com.itechart.app.model.utils.StringUtf8Encoder;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -125,18 +127,24 @@ public class UpdateContactAction implements ContactAction{
                 requestContent.insertAttribute(
                         ContactActionProperties.WAS_CONTACT_SUCCESSFULLY_SAVED_REQUEST_ATTRIBUTE,
                         ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
+                if(contact.getPhoto().getPhotoStream() != null) {
+                    byte[] photoData = IOUtils.toByteArray(contact.getPhoto().getPhotoStream());
+                    String encodedPhoto = Base64.getEncoder().encodeToString(photoData);
+                    requestContent.insertAttribute(ContactActionProperties.CONTACT_ATTRIBUTE_IMAGE,
+                            encodedPhoto);
+                }
 
                 dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
                 logger.info("Updating of contact with id=" + getContactId() + " was successful");
                 page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_DETAIL_PAGE_NAME);
             }
-        }catch (ContactDaoException cde){
-            logger.error(cde.getMessage());
+        }catch (Exception e){
+            logger.error(e.getMessage());
             if(dao != null) {
                 try {
                     dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_UNSUCCESSFUL);
-                } catch (ContactDaoException cdex){
-                    logger.error(cdex.getMessage());
+                } catch (ContactDaoException ex){
+                    logger.error(ex.getMessage());
                 }
             }
             page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);

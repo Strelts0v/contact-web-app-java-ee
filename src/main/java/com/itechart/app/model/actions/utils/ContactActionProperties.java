@@ -60,6 +60,7 @@ public class ContactActionProperties {
     // Get contact action properties
     public static final String CONTACT_ATTRIBUTE_ID = "contactId";
     public static final String CONTACT_ATTRIBUTE_NAME = "contact";
+    public static final String CONTACT_ATTRIBUTE_IMAGE = "image";
 
     // Search contact action properties
     public static final String SEARCH_FIRST_NAME_PARAM = "firstname";

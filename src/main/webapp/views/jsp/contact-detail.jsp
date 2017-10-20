@@ -30,7 +30,14 @@
         <!-- left side -->
         <div class="col-sm-2 text-center">
             <div class="well" id="contact-photo" onclick="showPhotoModal()">
-                <img src="../../pictures/no-person.jpg" class="img-circle" height="150" width="150" alt="Avatar">
+                <c:choose>
+                    <c:when test="${not empty image}">
+                        <img src="data:image/png;base64,${image}" class="img-circle" height="150" width="150" alt="Avatar">
+                    </c:when>
+                    <c:otherwise>
+                        <img src="../../pictures/no-person.jpg" class="img-circle" height="150" width="150" alt="Avatar">
+                    </c:otherwise>
+                </c:choose>
             </div>
             <div class="alert alert-success">
                 Don't forger to save changes!
@@ -425,6 +432,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
         <!-- Modal for adding/updating contact photo -->
         <div id="photo-modal" class="modal">
@@ -436,7 +444,8 @@
                 </div>
                 <div class="modal-body">
                     <label for="upload-photo">Find photo: </label>
-                    <input type="file" class="file" id="upload-photo" name="upload-photo" value="Find photo">
+                    <input type="file" class="file" id="upload-photo" name="upload-photo" value="Find photo"
+                           accept=".jpg,.png">
                 </div>
                 <div class="modal-footer">
                     <h3>Modal Footer</h3>

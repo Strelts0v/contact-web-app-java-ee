@@ -345,7 +345,7 @@ public class JdbcContactDaoHelper {
             updateContactPhotoStmt = connection.prepareStatement(updateContactPhotoSqlQuery);
             updateContactPhotoStmt.setBinaryStream(1, contact.getPhoto().getPhotoStream(),
                     contact.getPhoto().getPhotoSize());
-            updateContactPhotoStmt.setInt(2, contact.getPhoto().getPhotoId());
+            updateContactPhotoStmt.setInt(2, contact.getContactId());
 
             rowsUpdated = updateContactPhotoStmt.executeUpdate();
         } finally {
