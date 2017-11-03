@@ -129,6 +129,24 @@ public class JdbcContactDaoTest {
     }
 
     @Test
+    public void getContactByEmailShouldReturnCorrespondContactTest() throws Exception {
+        final String email = "ivan.vasilevskiy@gmail.com";
+        final String expectedFirstName = "Ivan";
+        final String expectedLastName = "Vasilevskiy";
+
+        Contact expectedContact = new Contact();
+        expectedContact.setFirstName(expectedFirstName);
+        expectedContact.setSurname(expectedLastName);
+
+        ContactDao dao = JdbcContactDao.newInstance();
+        Contact resultContact = dao.getContactByEmail(email);
+
+        final String errorMessage
+                = "Expected and actual contact are different";
+        Assert.assertEquals(errorMessage, expectedContact, resultContact);
+    }
+
+    @Test
     public void getContactShouldReturnCorrespondContactObjectTest() throws Exception{
         ContactDao dao = JdbcContactDao.newInstance();
         try {
