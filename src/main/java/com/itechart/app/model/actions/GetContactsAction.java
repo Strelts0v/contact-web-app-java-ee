@@ -21,7 +21,7 @@ public class GetContactsAction implements ContactAction{
 
         final String pageIndexStr = requestContent.getParameter(ContactActionProperties.CONTACT_PAGE_PARAM_NAME);
         final int pageIndex = Integer.parseInt(pageIndexStr);
-        final int offset = (pageIndex - 1) * ContactActionProperties.DEFAULT_CONTACT_COUNT;
+        int offset = (pageIndex - 1) * ContactActionProperties.DEFAULT_CONTACT_COUNT;
 
         ContactDao dao = null;
         try {
@@ -30,6 +30,7 @@ public class GetContactsAction implements ContactAction{
                 page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
             } else {
                 int contactCount = dao.getContactCount();
+                offset = validateContactOffset(offset, contactCount);
                 List<Contact> contactList = dao.getContacts(offset, ContactActionProperties.DEFAULT_CONTACT_COUNT);
                 requestContent.insertAttribute(ContactActionProperties.CONTACTS_ATTRIBUTE_NAME, contactList);
 
@@ -57,5 +58,12 @@ public class GetContactsAction implements ContactAction{
         }
         logger.info("Return " + page + " to client");
         return page;
+    }
+
+    private int validateContactOffset(int offset, int contactCount) {
+        if(offset > contactCount || offset < 0){
+            offset = ContactActionProperties.INITIAL_CONTACT_OFFSET;
+        }
+        return offset;
     }
 }
