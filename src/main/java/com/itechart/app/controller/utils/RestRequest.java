@@ -30,6 +30,7 @@ public class RestRequest {
         patterns.add(Pattern.compile("/search_contact"));
         patterns.add(Pattern.compile("/send_email_to_contacts"));
         patterns.add(Pattern.compile("/update_contact"));
+        patterns.add(Pattern.compile("/find_nationalities"));
     }
 
 
