@@ -66,7 +66,7 @@ public class CreateContactAction implements ContactAction{
                 if (dao == null) {
                     page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
                 } else {
-                    // start jdbc transaction
+                    // begin transaction
                     dao.initializeDao();
                     contact = dao.createContact(contact);
                     // add new attachments
@@ -86,6 +86,7 @@ public class CreateContactAction implements ContactAction{
                             ContactActionProperties.WAS_CONTACT_SUCCESSFULLY_SAVED_REQUEST_ATTRIBUTE,
                             ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
 
+                    // commit transaction and close connection
                     dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
 
                     page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_DETAIL_PAGE_NAME);
@@ -95,6 +96,7 @@ public class CreateContactAction implements ContactAction{
                 logger.error(cde.getMessage());
                 if(dao != null) {
                     try {
+                        // rollback transaction and close connection
                         dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_UNSUCCESSFUL);
                     } catch (ContactDaoException cdex){
                         logger.error(cdex.getMessage());
