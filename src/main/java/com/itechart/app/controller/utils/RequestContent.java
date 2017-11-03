@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class RequestContent {
 
+    /** Request object from client via HTTP */
     private HttpServletRequest request;
 
     public RequestContent(HttpServletRequest request){
@@ -16,10 +17,6 @@ public class RequestContent {
 
     public String getParameter(final String param){
         return request.getParameter(param);
-    }
-
-    public String[] getParameterValues(final String param){
-        return request.getParameterValues(param);
     }
 
     public void insertAttribute(final String name, final Object attribute){
