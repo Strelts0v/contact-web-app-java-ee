@@ -13,10 +13,22 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.List;
 
+/**
+ * Helper class that implement logic of uploading files
+ */
 public class ContactUploadHelper {
 
     private final Logger logger = LoggerFactory.getLogger(ContactUploadHelper.class);
 
+    private static final int MAX_FILE_SIZE = 1024*1024*10;
+
+    /**
+     * gets all request params including files
+     * @param request - request object from client via HTTP
+     * @param context - the context object of the called servlet
+     * @return list object with all request data
+     * @throws ServletException - if there is error during extracting files and other params
+     */
     public List<FileItem> getUploadFileItems(HttpServletRequest request,
                                              ServletContext context) throws ServletException {
         // Before you can work with the uploaded items, of course, you need
@@ -34,8 +46,7 @@ public class ContactUploadHelper {
 
         // Set factory constraints
         // Max constraint - when max is run out, data is written in temp directory
-        // set 10MB
-        diskFileItemFactory.setSizeThreshold(1024*1024*10);
+        diskFileItemFactory.setSizeThreshold(MAX_FILE_SIZE);
 
         // set temp dir
         File tempDir = (File)context.getAttribute("javax.servlet.context.tempdir");
@@ -45,7 +56,7 @@ public class ContactUploadHelper {
         ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory);
 
         // Set overall request size constraint. Set to 10 MB
-        upload.setSizeMax(1024 * 1024 * 10);
+        upload.setSizeMax(MAX_FILE_SIZE);
 
         // upload.setFileSizeMax - max file size
         List<FileItem> fileItems;

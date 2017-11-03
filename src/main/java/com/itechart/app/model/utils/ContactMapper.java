@@ -1,9 +1,7 @@
 package com.itechart.app.model.utils;
 
-import com.itechart.app.controller.utils.RequestContent;
 import com.itechart.app.model.entities.Contact;
 
-import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -28,31 +26,6 @@ public class ContactMapper {
     private static final String INDEX_PARAM = "index";
 
     private ContactMapper(){}
-
-    public static Contact mapContactParams(RequestContent requestContent) throws ParseException {
-        Contact contact = new Contact();
-
-        String contactIdStr = requestContent.getParameter(ID_PARAM);
-        if(contactIdStr != null){
-            contact.setContactId(Integer.parseInt(contactIdStr));
-        }
-        contact.setSurname(requestContent.getParameter(SURNAME_PARAM));
-        contact.setFirstName(requestContent.getParameter(FIRSTNAME_PARAM));
-        contact.setPatronymic(requestContent.getParameter(PATRONYMIC_PARAM));
-        contact.setGender(requestContent.getParameter(GENDER_PARAM));
-        contact.setNationality(requestContent.getParameter(NATIONALITY_PARAM));
-        contact.setMaritalStatus(requestContent.getParameter(MARITAL_STATUS_PARAM));
-        contact.setWebsite(requestContent.getParameter(WEBSITE_PARAM));
-        contact.setEmail(requestContent.getParameter(EMAIL_PARAM));
-        contact.setCompany(requestContent.getParameter(COMPANY_PARAM));
-        contact.setBirthday(requestContent.getParameter(BIRTHDAY_PARAM).replaceAll(".", "-"));
-        contact.setCountry(requestContent.getParameter(COUNTRY_PARAM));
-        contact.setCity(requestContent.getParameter(CITY_PARAM));
-        contact.setAddress(requestContent.getParameter(ADDRESS_PARAM));
-        contact.setIndexNumber(requestContent.getParameter(INDEX_PARAM));
-
-        return contact;
-    }
 
     public static Contact mapContactParams(Map<String, String> contactPropertiesMap) {
         Contact contact = new Contact();

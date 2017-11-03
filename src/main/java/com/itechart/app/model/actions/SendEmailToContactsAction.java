@@ -7,9 +7,9 @@ import com.itechart.app.model.actions.utils.ContactActionProperties;
 import com.itechart.app.model.dao.ContactDao;
 import com.itechart.app.model.dao.JdbcContactDao;
 import com.itechart.app.model.email.EmailManager;
+import com.itechart.app.model.entities.Contact;
 import com.itechart.app.model.enums.EmailTemplateEnum;
 import com.itechart.app.model.exceptions.ContactDaoException;
-import com.itechart.app.model.exceptions.EmailSendingException;
 import com.itechart.app.model.utils.PageConfigurationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,8 +60,16 @@ public class SendEmailToContactsAction implements ContactAction{
             Map<String, String> emailParamsMap = emailTemplate.getEmailParamsMap(requestContent);
             EmailManager emailManager = new EmailManager();
             try {
-                emailManager.sendEmail(emails, emailTemplate, emailParamsMap);
-            } catch (EmailSendingException ese){
+                ContactDao dao = JdbcContactDao.newInstance();
+                for (String email : emails) {
+                    List<String> emailToSend = new ArrayList<>();
+                    emailToSend.add(email);
+
+                    Contact contact = dao.getContactByEmail(email);
+                    emailParamsMap = insertContactAttributesToContact(contact, emailParamsMap);
+                    emailManager.sendEmail(emailToSend, emailTemplate, emailParamsMap);
+                }
+            } catch (Exception ese) {
                 logger.error(ese.getMessage());
                 page = getEmailErrorPage();
                 insertEmailSendingRequestAttributes(requestContent,
@@ -76,6 +84,22 @@ public class SendEmailToContactsAction implements ContactAction{
         }
         logger.info("Return " + page + " to client");
         return page;
+    }
+
+    private Map<String,String> insertContactAttributesToContact(
+            Contact contact, Map<String, String> emailParamsMap) {
+        if(contact == null){
+            emailParamsMap.put(ContactActionProperties.EMAIL_TO_FIRST_NAME_PARAM,
+                    ContactActionProperties.EMAIL_TO_FIRST_NAME_DEFAULT_PARAM);
+            emailParamsMap.put(ContactActionProperties.EMAIL_TO_LAST_NAME_PARAM,
+                    ContactActionProperties.EMAIL_TO_LAST_NAME_DEFAULT_PARAM);
+        } else {
+            emailParamsMap.put(ContactActionProperties
+                    .EMAIL_TO_FIRST_NAME_PARAM, contact.getFirstName());
+            emailParamsMap.put(ContactActionProperties
+                    .EMAIL_TO_LAST_NAME_PARAM, contact.getSurname());
+        }
+        return emailParamsMap;
     }
 
     private List<String> parseEmails(String emailsStr){

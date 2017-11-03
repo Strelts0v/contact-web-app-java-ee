@@ -4,75 +4,74 @@ package com.itechart.app.model.actions.utils;
  * holds constants for getting and extracting properties during
  * performing of contact action
  */
-public class ContactActionProperties {
-
-    /**
-     * makes class non-instantiation
-     */
-    private ContactActionProperties(){}
+public interface ContactActionProperties {
 
     // common properties for all actions
-    public final static String ERROR_PAGE_NAME = "path.page.jsp.error";
-    public final static String CONTACT_DETAIL_PAGE_NAME = "path.page.jsp.contact-detail";
-    public final static String CONTACT_LIST_PAGE_NAME = "path.page.jsp.contact-list";
-    public final static String SEARCH_CONTACT_PAGE_NAME = "path.page.jsp.search";
-    public final static String EMAIL_PAGE_NAME = "path.page.jsp.email";
-    public final static String CONTACTS_ATTRIBUTE_NAME = "contactList";
-    public final static String CONTACT_PARAM_IDS = "selectedContacts";
-    public final static int INITIAL_CONTACT_OFFSET = 0;
-    public final static int INITIAL_CONTACT_COUNT = 20;
-    public final static String CONTACT_SUBMIT_PARAM = "submit";
+    String ERROR_PAGE_NAME = "path.page.jsp.error";
+    String CONTACT_DETAIL_PAGE_NAME = "path.page.jsp.contact-detail";
+    String CONTACT_LIST_PAGE_NAME = "path.page.jsp.contact-list";
+    String SEARCH_CONTACT_PAGE_NAME = "path.page.jsp.search";
+    String EMAIL_PAGE_NAME = "path.page.jsp.email";
+    String CONTACTS_ATTRIBUTE_NAME = "contactList";
+    String CONTACT_PARAM_IDS = "selectedContacts";
+    int INITIAL_CONTACT_OFFSET = 0;
+    int INITIAL_CONTACT_COUNT = 20;
+    String CONTACT_SUBMIT_PARAM = "submit";
 
     // Update and create contact actions properties
-    public final static String FILE_ITEMS_ATTRIBUTE = "fileItems";
-    public final static String PHONES_PARAM = "phones";
-    public final static String ATTACHMENTS_PARAM = "attachments";
-    public final static String PHOTO_PARAM = "photo";
-    public final static String CONTACT_REQUEST_ATTRIBUTE = "contact";
-    public final static String WAS_CONTACT_SUCCESSFULLY_SAVED_REQUEST_ATTRIBUTE = "wasSaved";
-    public final static String CONTACT_ID_PARAM_NAME = "id_contact";
-    public final static Boolean CONTACT_UPDATE_WAS_SUCCESSFUL = true;
-    public final static Boolean CONTACT_UPDATE_WAS_UNSUCCESSFUL = false;
+    String FILE_ITEMS_ATTRIBUTE = "fileItems";
+    String PHONES_PARAM = "phones";
+    String ATTACHMENTS_PARAM = "attachments";
+    String PHOTO_PARAM = "photo";
+    String CONTACT_REQUEST_ATTRIBUTE = "contact";
+    String WAS_CONTACT_SUCCESSFULLY_SAVED_REQUEST_ATTRIBUTE = "wasSaved";
+    String CONTACT_ID_PARAM_NAME = "id_contact";
+    Boolean CONTACT_UPDATE_WAS_SUCCESSFUL = true;
+    Boolean CONTACT_UPDATE_WAS_UNSUCCESSFUL = false;
 
     // Email contact action properties
-    public final static String EMAIL_SUBMIT_PARAM = "submit";
-    public final static String EMAILS_TO_SEND_PARAM = "emails-to-send";
-    public final static String EMAIL_TEMPLATE_PARAM = "email-template";
-    public final static String EMAIL_BIRTHDAY_LAST_NAME_PARAM = "birthdayLastName";
-    public final static String EMAIL_BIRTHDAY_FIRST_NAME_PARAM = "birthdayFirstName";
-    public final static String EMAIL_PHONE_PARAM = "phone";
-    public final static String EMAIL_FROM_PARAM = "email";
-    public final static String EMAIL_FIRST_NAME_PARAM = "firstname";
-    public final static String EMAIL_LAST_NAME_PARAM = "lastname";
-    public final static String WAS_SENDING_EMAIL_SUCCESSFUL_REQUEST_ATTRIBUTE = "wasSend";
-    public final static Boolean SENDING_EMAIL_WAS_SUCCESSFUL = true;
-    public final static Boolean SENDING_EMAIL_WAS_UNSUCCESSFUL = false;
-    public final static String EMAIL_MESSAGE_PARAM = "message";
-    public final static String EMAIL_SUBJECT_PARAM = "subject";
-    public final static String EMAIL_INITIAL_EMAILS_TO_SEND_PARAM = "emails-ids-to-send";
-    public final static String EMAIL_INITIAL_EMAIL_TO_SEND_REQUEST_ATTRIBUTE = "emailsToSend";
+    String EMAIL_SUBMIT_PARAM = "submit";
+    String EMAILS_TO_SEND_PARAM = "emails-to-send";
+    String EMAIL_TEMPLATE_PARAM = "email-template";
+    String EMAIL_BIRTHDAY_LAST_NAME_PARAM = "birthdayLastName";
+    String EMAIL_BIRTHDAY_FIRST_NAME_PARAM = "birthdayFirstName";
+    String EMAIL_PHONE_PARAM = "phone";
+    String EMAIL_FROM_PARAM = "email";
+    String EMAIL_FIRST_NAME_PARAM = "firstname";
+    String EMAIL_LAST_NAME_PARAM = "lastname";
+    String EMAIL_TO_FIRST_NAME_PARAM = "firstnameTo";
+    String EMAIL_TO_LAST_NAME_PARAM = "lastnameTo";
+    String EMAIL_TO_FIRST_NAME_DEFAULT_PARAM = "";
+    String EMAIL_TO_LAST_NAME_DEFAULT_PARAM = "";
+    String WAS_SENDING_EMAIL_SUCCESSFUL_REQUEST_ATTRIBUTE = "wasSend";
+    Boolean SENDING_EMAIL_WAS_SUCCESSFUL = true;
+    Boolean SENDING_EMAIL_WAS_UNSUCCESSFUL = false;
+    String EMAIL_MESSAGE_PARAM = "message";
+    String EMAIL_SUBJECT_PARAM = "subject";
+    String EMAIL_INITIAL_EMAILS_TO_SEND_PARAM = "emails-ids-to-send";
+    String EMAIL_INITIAL_EMAIL_TO_SEND_REQUEST_ATTRIBUTE = "emailsToSend";
 
     // Get contacts action properties
-    public final static String CONTACT_PAGE_PARAM_NAME = "page";
-    public final static String CONTACT_COUNT_ATTRIBUTE_NAME = "pageCount";
-    public final static int DEFAULT_CONTACT_COUNT = 20;
+    String CONTACT_PAGE_PARAM_NAME = "page";
+    String CONTACT_COUNT_ATTRIBUTE_NAME = "pageCount";
+    int DEFAULT_CONTACT_COUNT = 20;
 
     // Get contact action properties
-    public static final String CONTACT_ATTRIBUTE_ID = "contactId";
-    public static final String CONTACT_ATTRIBUTE_NAME = "contact";
-    public static final String CONTACT_ATTRIBUTE_IMAGE = "image";
+    String CONTACT_ATTRIBUTE_ID = "contactId";
+    String CONTACT_ATTRIBUTE_NAME = "contact";
+    String CONTACT_ATTRIBUTE_IMAGE = "image";
 
     // Search contact action properties
-    public static final String SEARCH_FIRST_NAME_PARAM = "firstname";
-    public static final String SEARCH_SURNAME_PARAM = "surname";
-    public static final String SEARCH_PATRONYMIC_PARAM = "patronymic";
-    public static final String SEARCH_BIRTHDAY_FROM_PARAM = "birthday-from";
-    public static final String SEARCH_BIRTHDAY_TO_PARAM = "birthday-to";
-    public static final String SEARCH_GENDER_PARAM = "gender";
-    public static final String SEARCH_NATIONALITY_PARAM = "nationality";
-    public static final String SEARCH_MARITAL_STATUS_PARAM = "marital-status";
-    public static final String SEARCH_COUNTRY_PARAM = "country";
-    public static final String SEARCH_CITY_PARAM = "city";
-    public static final String SEARCH_ADDRESS_PARAM = "address";
-    public static final String SEARCH_INDEX_PARAM = "index";
+    String SEARCH_FIRST_NAME_PARAM = "firstname";
+    String SEARCH_SURNAME_PARAM = "surname";
+    String SEARCH_PATRONYMIC_PARAM = "patronymic";
+    String SEARCH_BIRTHDAY_FROM_PARAM = "birthday-from";
+    String SEARCH_BIRTHDAY_TO_PARAM = "birthday-to";
+    String SEARCH_GENDER_PARAM = "gender";
+    String SEARCH_NATIONALITY_PARAM = "nationality";
+    String SEARCH_MARITAL_STATUS_PARAM = "marital-status";
+    String SEARCH_COUNTRY_PARAM = "country";
+    String SEARCH_CITY_PARAM = "city";
+    String SEARCH_ADDRESS_PARAM = "address";
+    String SEARCH_INDEX_PARAM = "index";
 }

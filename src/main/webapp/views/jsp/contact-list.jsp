@@ -89,10 +89,15 @@
             </c:forEach>
             </tbody>
             </c:if>
+            <c:if test="${empty contactList}">
+                <tr>
+                    <td><strong><em>Contact List is empty.</em></strong></td>
+                </tr>
+            </c:if>
         </table>
 
         <%--Declare variable for current page and count of contacts --%>
-        <c:set var="currentPage" scope ="session" value="${param.page}"/>
+        <c:set var="currentPage" scope ="session" value="${(empty param.page) ? 1 : param.page}"/>
 
         <%--For displaying Page numbers--%>
         <ul class="pagination pull-right">

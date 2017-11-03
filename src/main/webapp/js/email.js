@@ -91,20 +91,6 @@ function removeEmailFromSendList(element){
 const EMAIL_TEMPLATE_INPUT_ID = "email-template";
 
 function selectTemplate(templateValue){
-    const BIRTHDAY = "Birthday";
-    const DEFAULT = "Default";
-
-    const BIRTHDAY_FORM_GROUP_ID = "birthday-form-group";
-    var birthdayFormGroup = document.getElementById(BIRTHDAY_FORM_GROUP_ID);
-
-    switch (templateValue){
-        case BIRTHDAY:
-            birthdayFormGroup.style.visibility = "visible";
-            break;
-        case DEFAULT:
-            birthdayFormGroup.style.visibility = "hidden";
-            break;
-    }
     var emailTemplateInput = document.getElementById(EMAIL_TEMPLATE_INPUT_ID);
     emailTemplateInput.value = templateValue;
 }

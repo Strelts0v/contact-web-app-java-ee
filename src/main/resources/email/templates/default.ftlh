@@ -6,7 +6,7 @@
 </head>
 <body>
     <div class="header">
-        <strong>Good afternoon,</strong>
+        <strong>Good afternoon, ${firstnameTo} ${lastnameTo}</strong>
         <br>
     </div>
     <div class="body">

@@ -38,15 +38,14 @@ public class UpdateContactAction implements ContactAction{
     private Map<String, String> contactPropertiesMap;
     private Map<String, Attachment> attachmentsMap;
     private List<Phone> phones;
-    private Photo photo = Photo.EMPTY_PHOTO;
+    private Photo photo;
     private int contactId;
 
-    public UpdateContactAction(){
+    public String execute(RequestContent requestContent) {
         contactPropertiesMap = new HashMap<>();
         attachmentsMap = new HashMap<>();
-    }
-
-    public String execute(RequestContent requestContent) {
+        phones = new ArrayList<>();
+        photo = Photo.EMPTY_PHOTO;
         String page;
 
         // parse FileItem objects into Contact entities
@@ -133,7 +132,7 @@ public class UpdateContactAction implements ContactAction{
                     requestContent.insertAttribute(ContactActionProperties.CONTACT_ATTRIBUTE_IMAGE,
                             encodedPhoto);
                 }
-
+                // commit transaction and close connection
                 dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
                 logger.info("Updating of contact with id=" + getContactId() + " was successful");
                 page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_DETAIL_PAGE_NAME);
@@ -142,6 +141,7 @@ public class UpdateContactAction implements ContactAction{
             logger.error(e.getMessage());
             if(dao != null) {
                 try {
+                    // rollback transaction and close connection
                     dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_UNSUCCESSFUL);
                 } catch (ContactDaoException ex){
                     logger.error(ex.getMessage());

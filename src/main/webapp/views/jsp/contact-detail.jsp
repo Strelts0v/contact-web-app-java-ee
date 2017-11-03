@@ -142,9 +142,10 @@
                 </select>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="nationality_group">
                 <label for="nationality">Nationality: *</label>
                 <input type="text" class="form-control" id="nationality" name="nationality"
+                       oninput="findNationalities(this.value)"
                 <c:if test="${not empty contact}">
                        value="${contact.nationality}"
                 </c:if>
@@ -262,7 +263,7 @@
 
                 <div class="hidden" id="attachments-warning">
                     <div class="alert alert-warning">
-                        <strong>Warning!</strong> Too many attachments selected to edit.
+                        <strong>Warning!</strong> None or too many attachments selected to edit.
                     </div>
                 </div>
 
@@ -317,7 +318,7 @@
 
                 <div class="hidden" id="phones-warning">
                     <div class="alert alert-warning">
-                        <strong>Warning!</strong> Too many phones selected to edit.
+                        <strong>Warning!</strong> None or too many phones selected to edit.
                     </div>
                 </div>
 
