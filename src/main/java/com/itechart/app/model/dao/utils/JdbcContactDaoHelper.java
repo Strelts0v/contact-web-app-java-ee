@@ -17,6 +17,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Helper class that contains common template methods for CRUD operations with contact data
+ */
 public class JdbcContactDaoHelper {
 
     private final Logger logger = LoggerFactory.getLogger(JdbcContactDao.class);
@@ -336,7 +339,7 @@ public class JdbcContactDaoHelper {
         return rowsUpdated;
     }
 
-    public int updateContactPhoto(Contact contact) throws SQLException{
+    private int updateContactPhoto(Contact contact) throws SQLException{
         final String updateContactPhotoSqlQuery = "UPDATE photos SET photo = ? WHERE id_photo = ?";
         int rowsUpdated;
         PreparedStatement updateContactPhotoStmt = null;
