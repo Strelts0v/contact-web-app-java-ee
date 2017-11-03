@@ -6,7 +6,7 @@
 </head>
 <body>
     <div class="header">
-        <strong>Happy birthday, ${birthdayFirstName} ${birthdayLastName}</strong>
+        <strong>Happy birthday, ${firstnameTo} ${lastnameTo}</strong>
         <br>
     </div>
     <div class="body">
