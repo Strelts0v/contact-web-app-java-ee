@@ -21,7 +21,7 @@ public class DeleteContactAction implements ContactAction{
         String page;
 
         final String contactIdsStr = requestContent.getParameter(ContactActionProperties.CONTACT_PARAM_IDS);
-        final int[] contactIds = parseContactIdsFromString(contactIdsStr);
+        final int[] contactIds = getContactIdsFromString(contactIdsStr);
 
         JdbcContactDao dao = null;
         try {
@@ -29,6 +29,7 @@ public class DeleteContactAction implements ContactAction{
             if (dao == null) {
                 page = PageConfigurationManager.getPageName(ContactActionProperties.ERROR_PAGE_NAME);
             } else {
+                // begin transaction
                 dao.initializeDao();
                 for (int i = 0; i < contactIds.length; i++) {
                     dao.deleteContact(contactIds[i]);
@@ -40,6 +41,7 @@ public class DeleteContactAction implements ContactAction{
                 requestContent.insertAttribute(ContactActionProperties.CONTACTS_ATTRIBUTE_NAME, contactList);
 
                 page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_LIST_PAGE_NAME);
+                // commit transaction
                 dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_SUCCESSFUL);
             }
 
@@ -47,6 +49,7 @@ public class DeleteContactAction implements ContactAction{
             logger.error(cde.getMessage());
             if(dao != null) {
                 try {
+                    // rollback transaction and close connection
                     dao.closeDao(ContactActionProperties.CONTACT_UPDATE_WAS_UNSUCCESSFUL);
                 } catch (ContactDaoException cdex){
                     logger.error(cdex.getMessage());
@@ -58,7 +61,7 @@ public class DeleteContactAction implements ContactAction{
         return page;
     }
 
-    private int[] parseContactIdsFromString(final String contactIdsStr) {
+    private int[] getContactIdsFromString(final String contactIdsStr) {
         final String splitterValue = ",";
 
         Iterable<String> idsStrIterator = Splitter.on(splitterValue)
