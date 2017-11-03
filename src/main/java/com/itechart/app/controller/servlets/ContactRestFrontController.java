@@ -1,6 +1,7 @@
 package com.itechart.app.controller.servlets;
 
 import com.itechart.app.controller.utils.ContactUploadHelper;
+import com.itechart.app.controller.utils.NationalitySearcherHelper;
 import com.itechart.app.controller.utils.RequestContent;
 import com.itechart.app.controller.utils.RestRequest;
 import com.itechart.app.model.actions.ContactAction;
@@ -22,13 +23,17 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+/**
+ * Contact application front controller
+ */
 public class ContactRestFrontController extends HttpServlet{
 
     private final Logger logger = LoggerFactory.getLogger(ContactRestFrontController.class);
 
     private static final String RESOURCE_ID_ATTRIBUTE = "contactId";
     private static final String FILE_ITEMS_ATTRIBUTE = "fileItems";
-    public final static String SUBMIT_PARAM = "submit";
+    private static final String SUBMIT_PARAM = "submit";
+    private static final String FIND_NATIONALITIES_REQUEST = "find_nationalities";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -54,6 +59,9 @@ public class ContactRestFrontController extends HttpServlet{
         processRequest(req, resp);
     }
 
+    /**
+     * processed request from client according URL template
+     */
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -62,6 +70,12 @@ public class ContactRestFrontController extends HttpServlet{
             response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
             // Create RestRequest object to handle REST request
             RestRequest restRequest = new RestRequest(request.getPathInfo());
+
+            if(isThirdPartyRequest(restRequest)){
+                NationalitySearcherHelper searcher = new NationalitySearcherHelper();
+                searcher.searchNationalities(request, response);
+                return;
+            }
 
             // Create wrapper for HttpServletRequest for getting params from JSP
             // and inserting attributes back to JSP
@@ -98,13 +112,17 @@ public class ContactRestFrontController extends HttpServlet{
 
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(pagePath);
             dispatcher.forward(request, response);
-        } catch (ServletException se){
+        } catch (Exception se){
             String pagePath = PageConfigurationManager
                     .getPageName(ContactActionProperties.ERROR_PAGE_NAME);
 
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(pagePath);
             dispatcher.forward(request, response);
         }
+    }
+
+    private boolean isThirdPartyRequest(RestRequest restRequest) {
+        return restRequest.getActionFromRestUrl().equals(FIND_NATIONALITIES_REQUEST);
     }
 
     private boolean isActionNeedFileUpload(ContactAction action, RequestContent requestContent){
