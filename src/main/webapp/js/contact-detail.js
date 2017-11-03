@@ -899,6 +899,7 @@ function updateContact(){
     for(var attachmentName in attachmentFileStorage){
         formData.append(attachmentName, attachmentFileStorage[attachmentName]);
     }
+    attachmentFileStorage = {};
 
     // add current contact photo to formData for sending to the server
     formData.append(PHOTO_PARAM_NAME, currentPhoto);
@@ -945,6 +946,55 @@ function checkEmailField(emailValue){
         isEmailFieldValid = false;
     }
     return isEmailFieldValid;
+}
+
+function findNationalities(pattern){
+    var xhr = new XMLHttpRequest();
+    xhr.open("get", "/api/find_nationalities?pattern=" + pattern, true);
+    xhr.onreadystatechange = function(){ setFoundNationalities(xhr) };
+    xhr.send();
+}
+
+function setFoundNationalities(xhr){
+    const nationalitiesGroupId = "nationality_group";
+    const foundResultsElemIndex = 2;
+    var nationalityInputElem = document.getElementById(nationalitiesGroupId);
+
+    if (xhr.status != 200 || xhr.responseText === "") {
+        if(nationalityInputElem.children.length == 3) {
+            nationalityInputElem.removeChild(nationalityInputElem.children[foundResultsElemIndex]);
+        }
+        return;
+    }
+    
+    var nationalities = JSON.parse(xhr.responseText);
+    if(nationalityInputElem.children.length == 3) {
+        nationalityInputElem.removeChild(nationalityInputElem.children[foundResultsElemIndex]);
+    }
+    var listGroupElem = document.createElement("ul");
+    listGroupElem.className = "list-group";
+
+    for(var i = 0; i < nationalities.length; i++){
+        var foundNationalityElem = document.createElement("li");
+        foundNationalityElem.className = "list-group-item";
+        foundNationalityElem.innerHTML = nationalities[i];
+        foundNationalityElem.onclick = function(){ setNationality(this.innerHTML) };
+        listGroupElem.appendChild(foundNationalityElem);
+    }
+    nationalityInputElem.appendChild(listGroupElem);
+}
+
+function setNationality(nationality){
+    const NATIONALITY_INPUT_ID = "nationality";
+    var nationalityInput = document.getElementById(NATIONALITY_INPUT_ID);
+    nationalityInput.value = nationality;
+
+    const nationalitiesGroupId = "nationality_group";
+    const foundResultsElemIndex = 2;
+    var nationalityInputElem = document.getElementById(nationalitiesGroupId);
+    if(nationalityInputElem.children.length == 3) {
+        nationalityInputElem.removeChild(nationalityInputElem.children[foundResultsElemIndex]);
+    }
 }
 
 const ERROR_BOX_ID = "error-alert-box";
