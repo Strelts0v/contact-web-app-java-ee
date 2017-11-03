@@ -149,7 +149,7 @@ public interface ContactDao {
      * returns attachments ids of contact with @param contactId
      * @param contactId - unique id of contact
      * @return list of attachment ids
-     * @throws ContactDaoException
+     * @throws ContactDaoException - if there is error during performing method
      */
     List<Integer> getContactAttachmentIds(int contactId) throws ContactDaoException;
 
@@ -157,9 +157,25 @@ public interface ContactDao {
      * returns phone ids of contact with @param contactId
      * @param contactId - unique id of contact
      * @return list of phone ids
-     * @throws ContactDaoException
+     * @throws ContactDaoException - if there is error during performing method
      */
     List<Integer> getContactPhonesIds(int contactId) throws ContactDaoException;
+
+    /**
+     * returns contact object which has specified email address
+     * @param email - email address of contact
+     * @return contact object if it has the specified email address
+     * @throws ContactDaoException - if there is error during performing method
+     */
+    Contact getContactByEmail(String email) throws ContactDaoException;
+
+    /**
+     * finds nationalities in database according specified pattern
+     * @param pattern - part of the country name
+     * @return list of found nationalities found nationalities
+     * @throws ContactDaoException - if there is error during performing method
+     */
+    List<String> findNationalities(String pattern) throws ContactDaoException;
 
     /**
      * perform actions to close dao object
