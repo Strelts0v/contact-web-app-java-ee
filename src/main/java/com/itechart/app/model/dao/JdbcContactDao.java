@@ -570,6 +570,58 @@ public class JdbcContactDao implements ContactDao {
         return contactList;
     }
 
+    @Override
+    public Contact getContactByEmail(String email) throws ContactDaoException {
+        Contact contact = null;
+        final String getContactByEmailSqlQuery =
+                "SELECT c.first_name, c.surname\n " +
+                " FROM contacts c WHERE email = ?";
+
+        PreparedStatement getContactByEmailStmt = null;
+        try{
+            getContactByEmailStmt = connection.prepareStatement(getContactByEmailSqlQuery);
+            getContactByEmailStmt.setString(1, email);
+
+            ResultSet resultSet = getContactByEmailStmt.executeQuery();
+            if(resultSet.next()){
+                contact = new Contact();
+                contact.setFirstName(resultSet.getString(1));
+                contact.setSurname(resultSet.getString(2));
+            }
+        } catch (SQLException sqle){
+            logger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
+        } finally {
+            closeStatement(getContactByEmailStmt);
+        }
+        return contact;
+    }
+
+    @Override
+    public List<String> findNationalities(String pattern) throws ContactDaoException {
+        List<String> foundNationalities = new ArrayList<>();
+        final String findNationalitiesSqlQuery =
+                "SELECT nationality FROM nationalities WHERE nationality LIKE ?";
+
+        PreparedStatement findNationalitiesStmt = null;
+        try{
+            findNationalitiesStmt = connection.prepareStatement(findNationalitiesSqlQuery);
+            findNationalitiesStmt.setString(1,
+                    SearchTemplateEngine.generateSearchTemplate(pattern));
+
+            ResultSet resultSet = findNationalitiesStmt.executeQuery();
+            while(resultSet.next()){
+                foundNationalities.add(resultSet.getString(1));
+            }
+        } catch (SQLException sqle){
+            logger.error(sqle.getMessage());
+            throw new ContactDaoException(sqle);
+        } finally {
+            closeStatement(findNationalitiesStmt);
+        }
+        return foundNationalities;
+    }
+
     /**
      * As JdbcContactDao instance uses connection from connection pool
      * @see DatabaseConnectionManager, it is important to release
