@@ -35,6 +35,13 @@ public class SearchContactAction implements ContactAction{
 
                 List<Contact> contacts = dao.findContacts(details);
                 requestContent.insertAttribute(ContactActionProperties.CONTACTS_ATTRIBUTE_NAME, contacts);
+
+                int pageCount = contacts.size() % ContactActionProperties.DEFAULT_CONTACT_COUNT == 0
+                        ? contacts.size() / ContactActionProperties.DEFAULT_CONTACT_COUNT
+                        : contacts.size() / ContactActionProperties.DEFAULT_CONTACT_COUNT + 1;
+
+                requestContent.insertAttribute(ContactActionProperties.CONTACT_COUNT_ATTRIBUTE_NAME, pageCount);
+
                 page = PageConfigurationManager.getPageName(ContactActionProperties.CONTACT_LIST_PAGE_NAME);
 
                 dao.closeDao();
